@@ -1,0 +1,45 @@
+----------------creation d'un pendu jouable en réseau--------------------------------------
+
+----------------regles--------------------------------
+-les clients n'envoient que des lettres, pas de mots.
+- depart avec 10 pts
+- 11 fautes -> perdu
+- une bonne (nouvelle) lettre => +1 par occurence pour le client 
+- une mauvaise (nouvelle) lettre => -1 pour le client
+- la derniere bonne lettre => +10 
+- pendu pendu => -3 pour tout le monde, seuil min 0;
+- une lettre deja enregistrée -> 0, rien ne se passe
+- lettres multiples ( ex: coucou -> _ _ _ _ _ _ -> 'u' -> _ _ u _ _ u -> +2 pts)
+- lettre non autorisé => -1 (ex: '@', ')' ...)
+- pas d'accents (ex Noël -> _ _ _ _ -> 'e' -> _ _ ë _ -> +1 pts)
+
+
+----------------SERVEUR--------------------------------
+-il propose les mots
+-gère les conflits (envoie de lettres simultanés) + conflits de noms
+-accepte les connexions des clients
+-retransmet les données à tous les clients, notamment les données envoyé par un 
+client qui vient de jouer
+-bannit les clients qui spament (optionnel)
+- créé les sockets, ne les ferme pas tant qu'il n'est pas ban
+- limite de joueur; 10 par exemple
+- plusieurs "salles" (optionel)
+- fixe une limite partielle
+- ne joue pas si 0 personnes
+- commence a 2 joueurs
+
+-compte les points (temporairement / le tps de la connexion)
+-est garant des regles
+
+----------------CLIENTS--------------------------------
+-se connecte au serveur
+-propose/envoie des lettres au serveur
+-interface de jeu ( tab de lettres utilisés, dessin du pendu, lettres ok)
+-peut se déconnecter
+
+
+----------------Implementation--------------------------------
+
+thread
+ihm : 1er tps-> terminal, ensuite peaufinage quand ca marche.
+
