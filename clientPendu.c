@@ -7,6 +7,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <linux/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <signal.h>
 #include <string.h>
 
 typedef struct sockaddr 	sockaddr;
@@ -25,7 +26,20 @@ int main(int argc, char **argv) {
     char *	prog; 			/* nom du programme */
     char *	host; 			/* nom de la machine distante */
     char	mesg[256]; 			/* message envoyé */
-     
+    
+    void closeEcoute(){
+      close(socket_descriptor);
+    }
+    void sig_handler(int signo)
+    {
+      if (signo == SIGINT)
+        closeEcoute();
+        exit(1);
+    }
+    
+  if (signal(SIGINT, sig_handler) == SIG_ERR){
+    printf("\ncan't catch SIGINT\n");
+  }
     if (argc != 2) {
 	perror("usage : client <adresse-serveur>");
 	exit(1);
@@ -66,7 +80,7 @@ int main(int argc, char **argv) {
     
     /*-----------------------------------------------------------*/
     /* SOLUTION 2 : utiliser un nouveau numero de port */
-    adresse_locale.sin_port = htons(5000);
+    adresse_locale.sin_port = htons(5042);
     /*-----------------------------------------------------------*/
     
     printf("numero de port pour la connexion au serveur : %d \n", ntohs(adresse_locale.sin_port));
@@ -102,7 +116,7 @@ int main(int argc, char **argv) {
                   
       /* lecture de la reponse en provenance du serveur */
       if((longueur = read(socket_descriptor, buffer, sizeof(buffer))) > 0) {
-	      printf("reponse du serveur : \n");
+	      printf(">");
 	      write(1,buffer,longueur);
       }
       

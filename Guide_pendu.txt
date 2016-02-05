@@ -43,3 +43,14 @@ client qui vient de jouer
 thread
 ihm : 1er tps-> terminal, ensuite peaufinage quand ca marche.
 
+ihm terminal : client-> thread qui refresh (clean de terminal) toute les secondes( ou plus souvent ou bien on demande au serveur si ca a bougé) 
+
+
+serveur: données :
+les threads se partagent une structure contenant:
+	- le mot
+	- les lettres trouvés 
+	- les lettres restantes
+	- les lettres fausses
+	
+	donc en parametre du thread on passe : une structure qui contient la structure commune et le socket qui lui est propre

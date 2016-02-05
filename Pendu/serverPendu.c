@@ -5,6 +5,7 @@ Serveur à lancer avant le client
 #include <stdio.h>
 #include <linux/types.h> 	/* pour les sockets */
 #include <sys/socket.h>
+#include <signal.h>
 #include <netdb.h> 		/* pour hostent, servent */
 #include <string.h> 		/* pour bcopy, ... */ 
 #include <pthread.h> 
@@ -15,6 +16,10 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct hostent hostent;
 typedef struct servent servent;
 
+/*------------------FONCTION INTERRUCTION------------------------------------*/
+
+
+/*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
 void renvoi (int sock) {
@@ -31,12 +36,12 @@ void renvoi (int sock) {
       }
       
       printf("essai %d : %s \n", i+1, buffer);
+      char res[256] ;
       
-      
-      buffer[0] = 'R';
-      buffer[1] = 'E';
-      buffer[longueur] = '#';
-      buffer[longueur+1] ='\0';
+      strcpy(res, "vous avez envoyé: ");
+      strcat(res, buffer);
+      strcat(res, "\n\0");
+
       
       
       printf("renvoi du message traite.\n");
@@ -44,9 +49,8 @@ void renvoi (int sock) {
       /* mise en attente du prgramme pour simuler un delai de transmission */
       sleep(3);
       
-      write(sock,buffer,strlen(buffer)+1);
+      write(sock,res,strlen(res)+1);
       
-      printf("message envoye. \n");
     }   
     return;
     
@@ -55,6 +59,8 @@ void renvoi (int sock) {
 
 /*------------------------------------------------------*/
 main(int argc, char **argv) {
+  
+  
 
     printf("\n     __________\n");
     printf("     | //      |\n");
@@ -117,7 +123,7 @@ main(int argc, char **argv) {
     */
     /*-----------------------------------------------------------*/
     /* SOLUTION 2 : utiliser un nouveau numero de port */
-    adresse_locale.sin_port = htons(5000);
+    adresse_locale.sin_port = htons(5042);
     /*-----------------------------------------------------------*/
     
     printf("numero de port pour la connexion au serveur : %d \n", 
@@ -137,6 +143,20 @@ main(int argc, char **argv) {
     
     /* initialisation de la file d'ecoute */
     listen(socket_descriptor,5);
+    void closeEcoute(){
+      close(socket_descriptor);
+    }
+    void sig_handler(int signo)
+    {
+      if (signo == SIGINT)
+      // fermer les clients avant
+        closeEcoute();
+        exit(1);
+    }
+    
+  if (signal(SIGINT, sig_handler) == SIG_ERR){
+    printf("\ncan't catch SIGINT\n");
+  }
     
     //On va créer reserver N thread pour les N clients max
     int N = 2, i=0,j;
