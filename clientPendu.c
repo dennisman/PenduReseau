@@ -4,6 +4,8 @@ client <adresse-serveur> <message-a-transmettre>
 ------------------------------------------------------------*/
 #include <stdlib.h>
 #include <stdio.h>
+#include <ncurses.h>
+#include <ctype.h>
 #include <linux/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -14,6 +16,9 @@ typedef struct sockaddr 	sockaddr;
 typedef struct sockaddr_in 	sockaddr_in;
 typedef struct hostent 		hostent;
 typedef struct servent 		servent;
+
+
+
 
 int main(int argc, char **argv) {
   
@@ -48,8 +53,53 @@ int main(int argc, char **argv) {
     prog = argv[0];
     host = argv[1];
     
+    //----------------Initialisation fenetre-----------------
+    int rows = 0;
+	  int cols = 0;
+    initscr();
+    start_color();
+    getmaxyx(stdscr, rows, cols);
     
-    
+    //----------------Verification taille min-----------------
+    if (rows < 16 || cols < 55)
+	  {
+		  endwin();
+		  fprintf(stderr, "ERROR : Too small terminal. Try resizing it. (min 16 rows and 55 colums)\n"
+						  "I recommand a size of 80x24.\n");
+		  exit(EXIT_FAILURE);
+	  }
+	  
+	   //----------------Verification couleur-----------------
+	  if(has_colors() == FALSE)
+	  {	endwin();
+		  printf("Your terminal does not support color\n");
+		  exit(1);
+	  }
+	  
+	  //--------------------DEFINITION DES COULEURS-----------------------
+  #define WHITE_B 1
+  init_pair(WHITE_B, COLOR_WHITE, COLOR_BLACK);
+  #define RED_B 2
+  init_pair(RED_B, COLOR_RED, COLOR_BLACK);
+  #define GREEN_B 3
+  init_pair(GREEN_B, COLOR_GREEN, COLOR_BLACK);
+  #define CYAN_B 4
+  init_pair(CYAN_B, COLOR_CYAN, COLOR_BLACK);
+  //color_set(RED_B, NULL);
+	  
+	  /* message d'accueil*/
+	mvprintw(4, (cols - 32)/2, "Voici un jeu de Pendu en Reseau !");
+	color_set(GREEN_B, NULL);
+	mvprintw(9, (cols - 32)/2, "Par COURAUD Thao & BORDET Dennis");
+	color_set(WHITE_B, NULL);
+	mvprintw(rows - 2, cols - (33), "Pressez une touche pour continuer");
+	
+	
+	refresh();
+	getch(); /* Pause */
+	
+	
+	endwin();
     
     printf("nom de l'executable : %s \n", prog);
     printf("adresse du serveur  : %s \n", host);
