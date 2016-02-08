@@ -16,6 +16,22 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct hostent hostent;
 typedef struct servent servent;
 
+typedef struct lettre_commun {
+
+    char* mot;
+    char* lettre_restante;
+    char* lettre_trouve_fausse;
+    char* lettre_trouve_vrai;
+
+};
+
+typedef struct param_thread {
+
+    struct lettre_commun;
+    int numero_socket;
+
+};
+
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
 
@@ -27,30 +43,30 @@ void renvoi (int sock) {
     char buffer[256];
     int longueur;
     int i;
-   for(i=0; i<10;++i){
+    for(i=0; i<10;++i){
 		  
 		  
-      if ((longueur = read(sock, buffer, sizeof(buffer))) <= 0){
-         printf("rien du tout \n");
-      	return;
-      }
-      
-      printf("essai %d : %s \n", i+1, buffer);
-      char res[256] ;
-      
-      strcpy(res, "vous avez envoyé: ");
-      strcat(res, buffer);
-      strcat(res, "\n\0");
+        if ((longueur = read(sock, buffer, sizeof(buffer))) <= 0){
+            printf("rien du tout \n");
+            return;
+        }
 
-      
-      
-      printf("renvoi du message traite.\n");
+        printf("essai %d : %s \n", i+1, buffer);
+        char res[256] ;
 
-      /* mise en attente du prgramme pour simuler un delai de transmission */
-      sleep(3);
-      
-      write(sock,res,strlen(res)+1);
-      
+        strcpy(res, "vous avez envoyé: ");
+        strcat(res, buffer);
+        strcat(res, "\n\0");
+
+
+
+        printf("renvoi du message traite.\n");
+
+        /* mise en attente du prgramme pour simuler un delai de transmission */
+        sleep(3);
+
+        write(sock,res,strlen(res)+1);
+
     }   
     return;
     
@@ -75,25 +91,25 @@ main(int argc, char **argv) {
     printf("#####################\n");
 
 
-    int 		socket_descriptor, 		/* descripteur de socket */
-			nouv_socket_descriptor, 	/* [nouveau] descripteur de socket */
-			longueur_adresse_courante; 	/* longueur d'adresse courante d'un client */
-    sockaddr_in 	adresse_locale, 		/* structure d'adresse locale*/
-			adresse_client_courant; 	/* adresse client courant */
-    hostent*		ptr_hote; 			/* les infos recuperees sur la machine hote */
-    servent*		ptr_service; 			/* les infos recuperees sur le service de la machine */
-    char 		machine[TAILLE_MAX_NOM+1]; 	/* nom de la machine locale */
+    int             socket_descriptor, 		    /* descripteur de socket */
+		            nouv_socket_descriptor, 	/* [nouveau] descripteur de socket */
+		            longueur_adresse_courante; 	/* longueur d'adresse courante d'un client */
+    sockaddr_in 	adresse_locale, 		    /* structure d'adresse locale*/
+		            adresse_client_courant; 	/* adresse client courant */
+    hostent*		ptr_hote; 			        /* les infos recuperees sur la machine hote */
+    servent*		ptr_service; 			    /* les infos recuperees sur le service de la machine */
+    char 		    machine[TAILLE_MAX_NOM+1]; 	/* nom de la machine locale */
     
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
     
     void *fct_thread(void * p_data){
-    int *sock_des = p_data;
+        int *sock_des = p_data;
 		printf("reception d'un message sur sock %d\n",*sock_des );
 		
 		renvoi(*sock_des);
 		close(*sock_des);
 		(void) p_data;
-   return NULL;
+        return NULL;
 		
 	}
     /* recuperation de la structure d'adresse en utilisant le nom */
@@ -126,8 +142,7 @@ main(int argc, char **argv) {
     adresse_locale.sin_port = htons(5042);
     /*-----------------------------------------------------------*/
     
-    printf("numero de port pour la connexion au serveur : %d \n", 
-		   ntohs(adresse_locale.sin_port) /*ntohs(ptr_service->s_port)*/);
+    printf("numero de port pour la connexion au serveur : %d \n",ntohs(adresse_locale.sin_port) /*ntohs(ptr_service->s_port)*/);
     
     /* creation de la socket */
     if ((socket_descriptor = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -143,9 +158,11 @@ main(int argc, char **argv) {
     
     /* initialisation de la file d'ecoute */
     listen(socket_descriptor,5);
+    
     void closeEcoute(){
-      close(socket_descriptor);
+        close(socket_descriptor);
     }
+    
     void sig_handler(int signo)
     {
       if (signo == SIGINT)
@@ -153,15 +170,15 @@ main(int argc, char **argv) {
         closeEcoute();
         exit(1);
     }
-    
-  if (signal(SIGINT, sig_handler) == SIG_ERR){
-    printf("\ncan't catch SIGINT\n");
-  }
+
+    if (signal(SIGINT, sig_handler) == SIG_ERR){
+        printf("\ncan't catch SIGINT\n");
+    }
     
     //On va créer reserver N thread pour les N clients max
     int N = 2, i=0,j;
     int * azerty[2];
-	  pthread_t* thread_id[N];
+	pthread_t* thread_id[N];
 	  
     /* attente des connexions et traitement des donnees recues */
     for(i=0;i<2;++i) {
@@ -169,11 +186,7 @@ main(int argc, char **argv) {
 		longueur_adresse_courante = sizeof(adresse_client_courant);
 		
 		/* adresse_client_courant sera renseigné par accept via les infos du connect */
-		if ((azerty[i]= 
-			accept(socket_descriptor, 
-			       (sockaddr*)(&adresse_client_courant),
-			       &longueur_adresse_courante))
-			 < 0) {
+		if ((azerty[i]= accept(socket_descriptor,(sockaddr*)(&adresse_client_courant),&longueur_adresse_courante))< 0) {
 			perror("erreur : impossible d'accepter la connexion avec le client.");
 			exit(1);
 		}
@@ -187,14 +200,14 @@ main(int argc, char **argv) {
         }
 
 		if(i==1){
-		  for( j=0; j<2;++j){
-        pthread_join(thread_id[j],NULL);
-      }
+		    for( j=0; j<2;++j){
+                pthread_join(thread_id[j],NULL);
+            }
 		  close(socket_descriptor);
 		}
-  }
+    }
     
 
-exit(0); 
+    exit(0); 
     
 }
