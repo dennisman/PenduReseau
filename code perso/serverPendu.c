@@ -23,14 +23,21 @@ typedef struct lettre_commun {
     char* lettre_trouve_fausse;
     char* lettre_trouve_vrai;
 
-};
+}lettre_commun;
 
 typedef struct param_thread {
 
-    struct lettre_commun;
+    lettre_commun l;
     int numero_socket;
 
-};
+}param_thread;
+
+typedef struct thread_socket {
+
+    pthread_t id;
+    int socket;
+
+}thread_socket;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
@@ -177,33 +184,29 @@ main(int argc, char **argv) {
     
     //On va créer reserver N thread pour les N clients max
     int N = 2, i=0,j;
-    int * azerty[2];
-	pthread_t* thread_id[N];
+    thread_socket* socket_tab[10];
+    int socket_tab_size = 0;
 	  
     /* attente des connexions et traitement des donnees recues */
-    for(i=0;i<2;++i) {
-    
-		longueur_adresse_courante = sizeof(adresse_client_courant);
+    for(;;) {
+    	if(socket_tab_size<11){
+			longueur_adresse_courante = sizeof(adresse_client_courant);
+			/* adresse_client_courant sera renseigné par accept via les infos du connect */
+			thread_socket *nouv_socket = malloc(sizeof(thread_socket));
 		
-		/* adresse_client_courant sera renseigné par accept via les infos du connect */
-		if ((azerty[i]= accept(socket_descriptor,(sockaddr*)(&adresse_client_courant),&longueur_adresse_courante))< 0) {
-			perror("erreur : impossible d'accepter la connexion avec le client.");
-			exit(1);
-		}
-		printf("nouv %d\n", azerty[i]);
-		// on veut 1 thread qui s'occupe de chaque client
+			if ((nouv_socket->socket= accept(socket_descriptor,(sockaddr*)(&adresse_client_courant),&longueur_adresse_courante))< 0) {
+				perror("erreur : impossible d'accepter la connexion avec le client.");
+				exit(1);
+			}
+			socket_tab[socket_tab_size] = nouv_socket;
+			socket_tab_size++;
+			// on veut 1 thread qui s'occupe de chaque client
 		
-		if( pthread_create( &(thread_id[i]) , NULL ,  fct_thread , (void*) &azerty[i]) < 0)
-        {
-            perror("could not create thread");
-            return 1;  
-        }
-
-		if(i==1){
-		    for( j=0; j<2;++j){
-                pthread_join(thread_id[j],NULL);
-            }
-		  close(socket_descriptor);
+			if( pthread_create( &(nouv_socket->id) , NULL ,  fct_thread , (void*) &(nouv_socket->socket)) < 0)
+		    {
+		        perror("could not create thread");
+		        return 1;  
+		    }
 		}
     }
     
