@@ -36,8 +36,13 @@ typedef struct thread_socket {
 
     pthread_t id;
     int socket;
+    char * pseudo;
+    int points;
 
 }thread_socket;
+
+thread_socket* socket_tab[10];
+int socket_tab_size = 0;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
@@ -45,6 +50,43 @@ typedef struct thread_socket {
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
+//ETAPE 1 de l'initialisation: pseudo
+void init_pseudo(thread_socket &tSock){
+
+  char buffer_pseudo[10];
+  int longueur;
+  char pseudo[12];
+  if ((longueur = read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo))) <= 0){
+      write(sock,"erreur pseudo trop court",25);
+  }else{
+    // creation du pseudo concaténé avec son numéro de socket
+    strcpy(pseudo, buffer_pseudo);
+    strcat(pseudo, tSock->socket);
+    strcat(pseudo, "\0");
+    
+    tSock->pseudo = malloc(12*sizeof(char));
+    strcpy(tSock->pseudo, pseudo);
+    
+    char repPseudo[] = "Votre pseudo pour le jeu sera : ";
+    strcat(repPseudo, pseudo);
+    
+    write(sock,repPseudo,strlen(repPseudo)+1);
+  }
+}
+
+
+void initialisation(thread_socket &tSock){
+
+init_pseudo(tSock);
+  
+//ETAPE 2: envoie des données des autres utilisateurs
+//pour chaque personne dans le tableau de socket, on encoie
+//son pseudo et ses point
+
+//Etape 3: envoie des lettres fausses et lettre trouvées + indices
+//dans le mot
+  
+}
 void renvoi (int sock) {
 
     char buffer[256];
@@ -113,6 +155,13 @@ main(int argc, char **argv) {
         int *sock_des = p_data;
 		printf("reception d'un message sur sock %d\n",*sock_des );
 		
+		//------------1ere etape------------------
+		//envoi des données pour que le client puisse initialiser le jeu
+		//initialisation(*sock_des);
+		
+		//------------2e etape------------------
+		// echanges avec le client
+		//play(*sock_des)
 		renvoi(*sock_des);
 		close(*sock_des);
 		(void) p_data;
@@ -182,10 +231,8 @@ main(int argc, char **argv) {
         printf("\ncan't catch SIGINT\n");
     }
     
-    //On va créer reserver N thread pour les N clients max
-    int N = 2, i=0,j;
-    thread_socket* socket_tab[10];
-    int socket_tab_size = 0;
+    //On va créer reserver N thread pour les N clients 
+    
 	  
     /* attente des connexions et traitement des donnees recues */
     for(;;) {
