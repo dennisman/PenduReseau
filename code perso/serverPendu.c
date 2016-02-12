@@ -40,7 +40,7 @@ typedef struct thread_socket {
     int points;
 
 }thread_socket;
-
+	
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
 
@@ -73,19 +73,36 @@ void init_pseudo(thread_socket &tSock){
     write(sock,repPseudo,strlen(repPseudo)+1);
   }
 }
+void init_others(thread_socket &tSock){
+	char buffer[1024]="others:";
+	int longueur;
+	int user;
+	thread_socket tmp;
+	
+	//Message : others:pseudoA,pointsA;pseudoB,pointsB.
+	for(user=0; user<socket_tab_size; user++){
+		tmp = socket_tab[user];
+		strcat(buffer,tmp->pseudo);
+		strcat(buffer,",");
+		strcat(buffer,(char*)tmp->points);
+		strcat(buffer,";");
+	}
+	strcat(buffer,".");
+
+}
 
 
 void initialisation(thread_socket &tSock){
 
-init_pseudo(tSock);
-  
-//ETAPE 2: envoie des données des autres utilisateurs
-//pour chaque personne dans le tableau de socket, on encoie
-//son pseudo et ses point
+	init_pseudo(tSock);
+	  
+	//ETAPE 2: envoie des données des autres utilisateurs
+	//pour chaque personne dans le tableau de socket, on envoie
+	//son pseudo et ses point
 
-//Etape 3: envoie des lettres fausses et lettre trouvées + indices
-//dans le mot
-  
+	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
+	//dans le mot
+	  
 }
 void renvoi (int sock) {
 

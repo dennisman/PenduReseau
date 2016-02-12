@@ -14,6 +14,32 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct hostent hostent;
 typedef struct servent servent;
 
+typedef struct lettre_commun {
+
+    char* mot;
+    char* lettre_restante;
+    char* lettre_trouve_fausse;
+    char* lettre_trouve_vrai;
+
+}lettre_commun;
+
+typedef struct param_thread {
+
+    lettre_commun l;
+    int numero_socket;
+
+}param_thread;
+
+typedef struct thread_socket {
+
+    pthread_t id;
+    int socket;
+    char * pseudo;
+    int points;
+
+}thread_socket;
+
+
 /*------------------------------------------------------*/
 void renvoi (int sock) {
 
