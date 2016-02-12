@@ -137,39 +137,39 @@ int main(int argc, char **argv) {
     
     /* creation de la socket */
     if ((socket_descriptor = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-	perror("erreur : impossible de creer la socket de connexion avec le serveur.");
-	exit(1);
+	    perror("erreur : impossible de creer la socket de connexion avec le serveur.");
+	    exit(1);
     }
     
     /* tentative de connexion au serveur dont les infos sont dans adresse_locale */
     if ((connect(socket_descriptor, (sockaddr*)(&adresse_locale), sizeof(adresse_locale))) < 0) {
-	perror("erreur : impossible de se connecter au serveur.");
-	exit(1);
+	    perror("erreur : impossible de se connecter au serveur.");
+	    exit(1);
     }
     
     printf("connexion etablie avec le serveur. \n");
     
     printf("envoi d'un message au serveur. \n");
-     while (strcmp(mesg, "quitter") !=0){
-      printf("\nmessage  a envoye   :\n");
-      scanf("%s", mesg);
-      /* envoi du message vers le serveur */
-      if ((write(socket_descriptor, mesg, strlen(mesg))) < 0) {
-	  perror("erreur : impossible d'ecrire le message destine au serveur.");
-	  exit(1);
-      }
-      
-      /* mise en attente du prgramme pour simuler un delai de transmission */
-     sleep(3);
-       
-      printf("message envoye au serveur. \n");
+    while (strcmp(mesg, "quitter") !=0){
+        printf("\nmessage  a envoye   :\n");
+        scanf("%s", mesg);
+        /* envoi du message vers le serveur */
+        if ((write(socket_descriptor, mesg, strlen(mesg)+1)) < 0) {
+            perror("erreur : impossible d'ecrire le message destine au serveur.");
+            exit(1);
+        }
+
+        /* mise en attente du prgramme pour simuler un delai de transmission */
+        sleep(3);
+
+        printf("message envoye au serveur. \n");
                   
-      /* lecture de la reponse en provenance du serveur */
-      if((longueur = read(socket_descriptor, buffer, sizeof(buffer))) > 0) {
-	      printf(">");
-	      write(1,buffer,longueur);
-      }
-      
+        /* lecture de la reponse en provenance du serveur */
+        if((longueur = read(socket_descriptor, buffer, sizeof(buffer))) > 0) {
+            printf(">");
+            write(1,buffer,longueur);
+        }
+
     }
    
     printf("\nfin de la reception. %d\n", socket_descriptor);

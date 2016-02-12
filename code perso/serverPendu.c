@@ -16,12 +16,18 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct hostent hostent;
 typedef struct servent servent;
 
+typedef struct lettre_num {
+
+    char lettre = '0';
+    int[27] position = {0};
+
+}lettre_num;
+
 typedef struct lettre_commun {
 
-    char* mot;
-    char* lettre_restante;
-    char* lettre_trouve_fausse;
-    char* lettre_trouve_vrai;
+    char[27] mot = {0};
+    char[26] lettre_trouve_fausse = {0};
+    lettre_num[26] lettre_trouve_vrai;
 
 }lettre_commun;
 
@@ -43,6 +49,7 @@ typedef struct thread_socket {
 	
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
+lettre_commun lettres;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
@@ -51,17 +58,16 @@ int socket_tab_size = 0;
 /*------------------------------------------------------*/
 
 //ETAPE 1 de l'initialisation: pseudo
-void init_pseudo(thread_socket &tSock){
+void init_pseudo(thread_socket *tSock){
 
   char buffer_pseudo[10];
-  int longueur;
   char pseudo[12];
-  if ((longueur = read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo))) <= 0){
-      write(sock,"erreur pseudo trop court",25);
+  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) <= 0){
+      write(tSock->socket,"erreur pseudo trop court",25);
   }else{
     // creation du pseudo concaténé avec son numéro de socket
     strcpy(pseudo, buffer_pseudo);
-    strcat(pseudo, tSock->socket);
+    strcat(pseudo, (char*)tSock->socket);
     strcat(pseudo, "\0");
     
     tSock->pseudo = malloc(12*sizeof(char));
@@ -70,16 +76,15 @@ void init_pseudo(thread_socket &tSock){
     char repPseudo[] = "Votre pseudo pour le jeu sera : ";
     strcat(repPseudo, pseudo);
     
-    write(sock,repPseudo,strlen(repPseudo)+1);
+    write(tSock->socket,repPseudo,strlen(repPseudo)+1);
   }
 }
-void init_others(thread_socket &tSock){
-	char buffer[1024]="others:";
-	int longueur;
+void init_others(thread_socket *tSock){
+	char buffer[256]="others:";
 	int user;
-	thread_socket tmp;
+	thread_socket *tmp;
 	
-	//Message : others:pseudoA,pointsA;pseudoB,pointsB.
+	//Message : others:pseudoA,pointsA;pseudoB,pointsB;.
 	for(user=0; user<socket_tab_size; user++){
 		tmp = socket_tab[user];
 		strcat(buffer,tmp->pseudo);
@@ -88,20 +93,45 @@ void init_others(thread_socket &tSock){
 		strcat(buffer,";");
 	}
 	strcat(buffer,".");
+	
+	write(tSock->socket,buffer,strlen(buffer)+1);
+
+}
+
+void init_lettres(thread_socket *tSock){
+
+    char buffer[200]="lettresTrouvees:";
+    
+    //Message : lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,};lettresFausses:lettre1,lettre2.
+    for(lettre_commun c : lettres.lettre_trouve_vrai){
+        if(c.lettre != '0'){
+            strcat(buffer,c.lettre);
+            strcat(buffer,'{');
+            for(int i : c.position){
+                strcat(buffer,i);
+                strcat(buffer,",");
+            }
+            strcat(buffer,'}');
+            
+        }
+    }
 
 }
 
 
-void initialisation(thread_socket &tSock){
+void initialisation(thread_socket *tSock){
 
 	init_pseudo(tSock);
 	  
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses point
+	
+	init_others(tSock);
 
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
+	
 	  
 }
 void renvoi (int sock) {
