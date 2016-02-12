@@ -142,28 +142,28 @@ int main(int argc, char **argv) {
     /* creation de la socket */
     if ((socket_descriptor = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     color_set(RED_B, NULL);
-	mvprintw(rows/2,0,"erreur : impossible de creer la socket de connexion avec le serveur.");
-	mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
-	getch();
-	endwin();
-	exit(1);
+	  mvprintw(rows/2,0,"erreur : impossible de creer la socket de connexion avec le serveur.");
+	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
+	  getch();
+	  endwin();
+	  exit(1);
     }
     
     /* tentative de connexion au serveur dont les infos sont dans adresse_locale */
     if ((connect(socket_descriptor, (sockaddr*)(&adresse_locale), sizeof(adresse_locale))) < 0) {
     color_set(RED_B, NULL);
-	mvprintw(rows/2,0,"erreur : impossible de se connecter au serveur.");
-	mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
-	getch();
-	endwin();
-	exit(1);
+	  mvprintw(rows/2,0,"erreur : impossible de se connecter au serveur.");
+	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
+	  getch();
+	  endwin();
+	  exit(1);
     }
 	
 	
 	color_set(GREEN_B, NULL);
 	mvprintw(rows/2,cols/2,"Connexion effectué avec succès.");
 	color_set(WHITE_B, NULL);
-	mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer.");
+	mvprintw(rows - 2, cols - (33), "Pressez une touche pour continuer.");
 	getch();
 	
 	
@@ -171,15 +171,25 @@ int main(int argc, char **argv) {
 	clear();
 	refresh();
 	
-	mvprintw(rows/2,(cols-strlen(msg))/2,"%s",msg);
+	mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
 	getstr(pseudo);
- 	mvprintw(LINES - 2, 0, "envoie de votre pseudo au serveur: %s", pseudo);
- 	
- 	if ((write(socket_descriptor, mesg, strlen(mesg))) < 0) {
-	  perror("erreur : impossible d'ecrire le message destine au serveur.");
+ 	mvprintw(2, 0, "Envoie de votre pseudo au serveur: %s", pseudo);
+ 	if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
+ 	  color_set(RED_B, NULL);
+	  mvprintw(rows/2,0,"erreur : impossible d'ecrire le message destine au serveur.");
+	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
+	  getch();
+	  endwin();
 	  exit(1);
       }
+      
+      char pseudoRenv[50];
+      read(socket_descriptor, pseudoRenv, sizeof(pseudoRenv));
+      mvprintw(rows - 2, 0, ">%s", pseudoRenv);
+      
+      
  	getch();
+	
 	
 	endwin();
     

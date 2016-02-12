@@ -9,6 +9,8 @@ Serveur à lancer avant le client
 #include <netdb.h> 		/* pour hostent, servent */
 #include <string.h> 		/* pour bcopy, ... */ 
 #include <pthread.h> 
+#include <ctype.h>
+
 #define TAILLE_MAX_NOM 256
 
 typedef struct sockaddr sockaddr;
@@ -18,16 +20,16 @@ typedef struct servent servent;
 
 typedef struct lettre_num {
 
-    char lettre = '0';
-    int[27] position = {0};
+    char lettre;// = 0;
+    int position[27];// = {0};
 
 }lettre_num;
 
 typedef struct lettre_commun {
 
-    char[27] mot = {0};
-    char[26] lettre_trouve_fausse = {0};
-    lettre_num[26] lettre_trouve_vrai;
+    char mot[27];// = {0};
+    char lettre_trouve_fausse[26];// = {0};
+    lettre_num lettre_trouve_vrai[26];
 
 }lettre_commun;
 
@@ -58,19 +60,19 @@ lettre_commun lettres;
 /*------------------------------------------------------*/
 
 //ETAPE 1 de l'initialisation: pseudo
-void init_pseudo(thread_socket *tSock){
+void init_pseudo(thread_socket* tSock){
 
   char buffer_pseudo[10];
-  char pseudo[12];
-  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) <= 0){
+  char pseudo[12]="";
+  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) <= 1){
       write(tSock->socket,"erreur pseudo trop court",25);
   }else{
     // creation du pseudo concaténé avec son numéro de socket
     strcpy(pseudo, buffer_pseudo);
-    strcat(pseudo, (char*)tSock->socket);
-    strcat(pseudo, "\0");
-    
-    tSock->pseudo = malloc(12*sizeof(char));
+    char str[5];
+    sprintf(str,"%d",tSock->socket);
+    strcat(pseudo, str);
+    tSock->pseudo = malloc(13*sizeof(char));
     strcpy(tSock->pseudo, pseudo);
     
     char repPseudo[] = "Votre pseudo pour le jeu sera : ";
@@ -79,6 +81,7 @@ void init_pseudo(thread_socket *tSock){
     write(tSock->socket,repPseudo,strlen(repPseudo)+1);
   }
 }
+/*
 void init_others(thread_socket *tSock){
 	char buffer[256]="others:";
 	int user;
@@ -118,16 +121,16 @@ void init_lettres(thread_socket *tSock){
 
 }
 
-
-void initialisation(thread_socket *tSock){
+*/
+void initialisation(thread_socket* tSock){
 
 	init_pseudo(tSock);
-	  
+	 // renvoi(tSock->socket);
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses point
 	
-	init_others(tSock);
+	//init_others(tSock);
 
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
@@ -199,20 +202,25 @@ main(int argc, char **argv) {
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
     
     void *fct_thread(void * p_data){
-        int *sock_des = p_data;
-		printf("reception d'un message sur sock %d\n",*sock_des );
+      int* num_thread_sock = p_data;
+      num_thread_sock--;
+      //printf("fct_thread-----  : %s\n",);
+      printf("fct_thread----- num_thread : %d\n",*num_thread_sock);
+      
+      thread_socket *thread_sock= socket_tab[*num_thread_sock];
+		  printf("reception d'un message sur sock %d\n",thread_sock->socket );
 		
-		//------------1ere etape------------------
-		//envoi des données pour que le client puisse initialiser le jeu
-		//initialisation(*sock_des);
+		  //------------1ere etape------------------
+		  //envoi des données pour que le client puisse initialiser le jeu
+		  initialisation(thread_sock);
 		
-		//------------2e etape------------------
-		// echanges avec le client
-		//play(*sock_des)
-		renvoi(*sock_des);
-		close(*sock_des);
-		(void) p_data;
-        return NULL;
+		  //------------2e etape------------------
+		  // echanges avec le client
+		  //play(*sock_des)
+		  //renvoi(*sock_des);
+		  close(thread_sock->socket );
+		  (void) p_data;
+      return NULL;
 		
 	}
     /* recuperation de la structure d'adresse en utilisant le nom */
@@ -264,6 +272,10 @@ main(int argc, char **argv) {
     
     void closeEcoute(){
         close(socket_descriptor);
+        int i;
+        for(i =0; i<socket_tab_size; i++){
+          close(socket_tab[i]->socket);
+        }
     }
     
     void sig_handler(int signo)
@@ -296,7 +308,7 @@ main(int argc, char **argv) {
 			socket_tab_size++;
 			// on veut 1 thread qui s'occupe de chaque client
 		
-			if( pthread_create( &(nouv_socket->id) , NULL ,  fct_thread , (void*) &(nouv_socket->socket)) < 0)
+			if( pthread_create( &(nouv_socket->id) , NULL ,  fct_thread , (void*) &(socket_tab_size)) < 0)
 		    {
 		        perror("could not create thread");
 		        return 1;  
