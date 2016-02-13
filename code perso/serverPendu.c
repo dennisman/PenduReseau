@@ -64,7 +64,7 @@ void init_pseudo(thread_socket* tSock){
 
   char buffer_pseudo[10];
   char pseudo[12]="";
-  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) <= 1){
+  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) <= 0){
       write(tSock->socket,"erreur pseudo trop court",25);
   }else{
     // creation du pseudo concaténé avec son numéro de socket
@@ -75,13 +75,13 @@ void init_pseudo(thread_socket* tSock){
     tSock->pseudo = malloc(13*sizeof(char));
     strcpy(tSock->pseudo, pseudo);
     
-    char repPseudo[] = "Votre pseudo pour le jeu sera : ";
+    char repPseudo[] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
     
     write(tSock->socket,repPseudo,strlen(repPseudo)+1);
   }
 }
-/*
+
 void init_others(thread_socket *tSock){
 	char buffer[256]="others:";
 	int user;
@@ -92,7 +92,9 @@ void init_others(thread_socket *tSock){
 		tmp = socket_tab[user];
 		strcat(buffer,tmp->pseudo);
 		strcat(buffer,",");
-		strcat(buffer,(char*)tmp->points);
+		char str[5];
+		sprintf(str,"%d",tmp->points);
+		strcat(buffer,str);
 		strcat(buffer,";");
 	}
 	strcat(buffer,".");
@@ -100,7 +102,7 @@ void init_others(thread_socket *tSock){
 	write(tSock->socket,buffer,strlen(buffer)+1);
 
 }
-
+/*
 void init_lettres(thread_socket *tSock){
 
     char buffer[200]="lettresTrouvees:";
@@ -125,12 +127,12 @@ void init_lettres(thread_socket *tSock){
 void initialisation(thread_socket* tSock){
 
 	init_pseudo(tSock);
-	 // renvoi(tSock->socket);
+	
+	
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
-	//son pseudo et ses point
-	
-	//init_others(tSock);
+	//son pseudo et ses points
+	init_others(tSock);
 
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
@@ -205,7 +207,6 @@ main(int argc, char **argv) {
       int* num_thread_sock = p_data;
       num_thread_sock--;
       //printf("fct_thread-----  : %s\n",);
-      printf("fct_thread----- num_thread : %d\n",*num_thread_sock);
       
       thread_socket *thread_sock= socket_tab[*num_thread_sock];
 		  printf("reception d'un message sur sock %d\n",thread_sock->socket );

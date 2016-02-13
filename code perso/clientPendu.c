@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 	char word[27];
 	char hangman[300] = {0};
 	char letters[27] = {0};
-	char pseudo[10];
+	char *pseudo;
 	char msg[]="Entrez votre pseudo : ";
 	char scannedChar = 0;
 	char oldScannedChar = 0;
@@ -172,7 +172,18 @@ int main(int argc, char **argv) {
 	refresh();
 	
 	mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
-	getstr(pseudo);
+	int taille_pseudo;
+	do{
+	  refresh();
+	  getstr(pseudo);
+	  taille_pseudo = strlen(pseudo);
+	  if(taille_pseudo < 1|| taille_pseudo>10){
+	    color_set(RED_B, NULL);
+	    mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères");
+	    color_set(WHITE_B, NULL);
+	  }
+	}while(taille_pseudo < 1|| taille_pseudo>10);
+	
  	mvprintw(2, 0, "Envoie de votre pseudo au serveur: %s", pseudo);
  	if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
  	  color_set(RED_B, NULL);
@@ -181,13 +192,14 @@ int main(int argc, char **argv) {
 	  getch();
 	  endwin();
 	  exit(1);
-      }
-      
-      char pseudoRenv[50];
-      read(socket_descriptor, pseudoRenv, sizeof(pseudoRenv));
-      mvprintw(rows - 2, 0, ">%s", pseudoRenv);
-      
-      
+  }
+  
+  char pseudoRenv[50];
+  read(socket_descriptor, pseudoRenv, sizeof(pseudoRenv));
+  mvprintw(rows - 2, 0, ">%s", pseudoRenv);
+  
+  pseudo = strchr(pseudoRenv,':');
+  printf(pseudo);
  	getch();
 	
 	
