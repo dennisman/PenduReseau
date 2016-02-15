@@ -98,7 +98,7 @@ void init_others(thread_socket *tSock){
 		strcat(buffer,";");
 	}
 	strcat(buffer,".");
-	
+	printf ("users : %s\n", buffer);
 	write(tSock->socket,buffer,strlen(buffer)+1);
 
 }
@@ -125,7 +125,7 @@ void init_lettres(thread_socket *tSock){
 
 */
 void initialisation(thread_socket* tSock){
-
+  tSock->points = 10;
 	init_pseudo(tSock);
 	
 	
