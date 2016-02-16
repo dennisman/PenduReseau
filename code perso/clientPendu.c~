@@ -206,8 +206,12 @@ int main(int argc, char **argv) {
   mvprintw(rows - 2, 0, ">%s", pseudo);
   
   
-  /*tabJoueurs[0]->pseudo = pseudo;
-  tabJoueurs[0]->points = points;*/
+  
+  // JE VEUX VOIR ICI SI Y A PAS DE SEG FAULT SI ON ALLOUE LA CASE
+  // par la suite fait dans la boucle de parseur
+  
+
+  
   
  	getch();
 	
@@ -220,12 +224,27 @@ int main(int argc, char **argv) {
 	char * joueur_i;
 	char * joueur_points;
 	char bufJoueurs[256];
-	read(socket_descriptor, buffer, strlen(buffer));
+	char buffer2[256];
+	int taille_others;
+	if((taille_others = read(socket_descriptor, buffer, 256))<1){
+	  printf("error\n");
+	};
 	
+	wait(9000);
+	//Message : others:pseudoA,pointsA;pseudoB,pointsB;.
 	mvprintw(2, 0,"users : %s\n", buffer);
 	getch();
-	//Message : others:pseudoA,pointsA;pseudoB,pointsB;.
-	strcpy(bufJoueurs,strchr(buffer, ':')); 
+	if(buffer[0]!='o' || buffer[6]!=':'){
+	  color_set(RED_B, NULL);
+	  mvprintw(rows/2,0,"erreur : Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
+	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
+	  getch();
+	  endwin();
+	  exit(1);
+	}
+	
+	//COMPILER AVEC -g sinon erreur compil
+	strcpy(bufJoueurs,strchr(buffer, ':'));
 	if(strlen(buffer)==strlen(bufJoueurs)){
 	  color_set(RED_B, NULL);
 	  mvprintw(rows/2,0,"erreur : mauvaise reception des autres joueurs");
@@ -235,17 +254,25 @@ int main(int argc, char **argv) {
 	  exit(1);
 	}
 
-	/*
+	
 	joueur_i = strtok(bufJoueurs, ";");
 	do{
-	  
+	  tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
+	  printf("1-joueur i: %s\n", joueur_i);
+	  joueur_points = strtok(joueur_i, ",");
+	  printf("2-joueur p: %s\n", joueur_points);
+	  printf("2-joueur i: %s\n", joueur_i);
 	  strcpy(tabJoueurs[nbJoueurs]->nom, joueur_points);
 	  joueur_points = strtok(NULL, ",");
+	  printf("3-joueur p: %s\n", joueur_points);
+	  printf("3-joueur i: %s\n", joueur_i);
 	  strcpy(tabJoueurs[nbJoueurs]->points, joueur_points);
 	  nbJoueurs++;
 	  joueur_i = strtok(NULL, ";");
-	}while (joueur_i !=".");
-*/
+	  printf("4-joueur p: %s\n", joueur_points);
+	  printf("4-joueur i: %s\n", joueur_i);
+	}while (joueur_i !="." ||joueur_i != NULL);
+
   getch();
 	endwin();
     

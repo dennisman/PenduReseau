@@ -98,8 +98,10 @@ void init_others(thread_socket *tSock){
 		strcat(buffer,";");
 	}
 	strcat(buffer,".");
-	printf ("users : %s", buffer);
-	write(tSock->socket,buffer,strlen(buffer)+1);
+	printf ("users : %s\n", buffer);
+	write(tSock->socket,buffer,sizeof(buffer)+1);
+	printf ("users : %s\n", buffer);
+	read(tSock->socket,buffer,sizeof(buffer)+1);
 
 }
 /*
@@ -204,7 +206,7 @@ main(int argc, char **argv) {
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
     
     void *fct_thread(void * p_data){
-      int* num_thread_sock = p_data;
+      int num_thread_sock = p_data;
       num_thread_sock--;
       //printf("fct_thread-----  : %s\n",);
       
@@ -272,11 +274,12 @@ main(int argc, char **argv) {
     listen(socket_descriptor,5);
     
     void closeEcoute(){
-        close(socket_descriptor);
         int i;
         for(i =0; i<socket_tab_size; i++){
           close(socket_tab[i]->socket);
         }
+        close(socket_descriptor);
+        
     }
     
     void sig_handler(int signo)
@@ -306,10 +309,12 @@ main(int argc, char **argv) {
 				exit(1);
 			}
 			socket_tab[socket_tab_size] = nouv_socket;
+			
 			socket_tab_size++;
+			printf("nouveau client, taille tab=%d\n",socket_tab_size);
 			// on veut 1 thread qui s'occupe de chaque client
 		
-			if( pthread_create( &(nouv_socket->id) , NULL ,  fct_thread , (void*) &(socket_tab_size)) < 0)
+			if( pthread_create( &(nouv_socket->id) , NULL ,  fct_thread , (void*) socket_tab_size) < 0)
 		    {
 		        perror("could not create thread");
 		        return 1;  
