@@ -75,7 +75,7 @@ void init_pseudo(thread_socket* tSock){
     tSock->pseudo = malloc(13*sizeof(char));
     strcpy(tSock->pseudo, pseudo);
     
-    char repPseudo[] = "Votre pseudo pour le jeu sera :";
+    char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
     
     write(tSock->socket,repPseudo,strlen(repPseudo)+1);
@@ -129,7 +129,6 @@ void init_lettres(thread_socket *tSock){
 void initialisation(thread_socket* tSock){
   tSock->points = 10;
 	init_pseudo(tSock);
-	
 	
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
@@ -216,7 +215,7 @@ main(int argc, char **argv) {
 		  //------------1ere etape------------------
 		  //envoi des données pour que le client puisse initialiser le jeu
 		  initialisation(thread_sock);
-		
+		  printf("lol\n");
 		  //------------2e etape------------------
 		  // echanges avec le client
 		  //play(*sock_des)
