@@ -72,7 +72,7 @@ void init_pseudo(thread_socket* tSock){
     char str[5];
     sprintf(str,"%d",tSock->socket);
     strcat(pseudo, str);
-    tSock->pseudo = malloc(13*sizeof(char));
+    tSock->pseudo = malloc(15*sizeof(char));
     strcpy(tSock->pseudo, pseudo);
     
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
@@ -84,6 +84,7 @@ void init_pseudo(thread_socket* tSock){
 
 void init_others(thread_socket *tSock){
 	char buffer[256]="others:";
+	char buffer2[256];
 	int user;
 	thread_socket *tmp;
 	
@@ -99,9 +100,11 @@ void init_others(thread_socket *tSock){
 	}
 	strcat(buffer,".");
 	printf ("users : %s\n", buffer);
-	write(tSock->socket,buffer,sizeof(buffer)+1);
-	printf ("users : %s\n", buffer);
-	read(tSock->socket,buffer,sizeof(buffer)+1);
+	
+	strcpy(buffer2,buffer); // evite une erreur d'optimisation du compilo
+	// en fait non pas toujours
+	write(tSock->socket,buffer2,sizeof(buffer2)+1);
+	
 
 }
 /*
@@ -134,7 +137,8 @@ void initialisation(thread_socket* tSock){
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses points
 	init_others(tSock);
-
+  char buffer[256];
+  read(tSock->socket,buffer,sizeof(buffer)+1);
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
 	

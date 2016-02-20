@@ -221,13 +221,14 @@ int main(int argc, char **argv) {
 	char * joueur_i;
 	char * joueur_points;
 	char bufJoueurs[256];
-	char buffer2[256];
-	int taille_others;
-	if((taille_others = read(socket_descriptor, buffer2, 256))<1){
+	char *buffer2;
+	buffer2 = malloc(256*sizeof(char));
+	bzero(buffer2,256);
+	if(read(socket_descriptor, buffer2, 256)<1){
 	  printf("error\n");
 	};
 	
-	wait(100000);
+	
 	//Message : others:pseudoA,pointsA;pseudoB,pointsB;.
 	mvprintw(2, 0,"users : %s\n", buffer2);
 	getch();
@@ -251,14 +252,13 @@ int main(int argc, char **argv) {
 	  exit(1);
 	}
 
-	
+	free(buffer2);
 	joueur_i = strtok(bufJoueurs, ";");
 	do{
 	  tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
 	  strcpy(tabJoueurs[nbJoueurs]->nom, joueur_i);
 	  nbJoueurs++;
 	  joueur_i = strtok(NULL, ";");
-	  printf("4-joueur i: %s\n", joueur_i);
 	}while (strcmp(joueur_i ,".")!=0 &&joueur_i != NULL);
 	
 	
