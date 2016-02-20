@@ -207,9 +207,6 @@ int main(int argc, char **argv) {
   
   
   
-  // JE VEUX VOIR ICI SI Y A PAS DE SEG FAULT SI ON ALLOUE LA CASE
-  // par la suite fait dans la boucle de parseur
-  
 
   
   
@@ -226,15 +223,15 @@ int main(int argc, char **argv) {
 	char bufJoueurs[256];
 	char buffer2[256];
 	int taille_others;
-	if((taille_others = read(socket_descriptor, buffer, 256))<1){
+	if((taille_others = read(socket_descriptor, buffer2, 256))<1){
 	  printf("error\n");
 	};
 	
-	wait(9000);
+	wait(100000);
 	//Message : others:pseudoA,pointsA;pseudoB,pointsB;.
-	mvprintw(2, 0,"users : %s\n", buffer);
+	mvprintw(2, 0,"users : %s\n", buffer2);
 	getch();
-	if(buffer[0]!='o' || buffer[6]!=':'){
+	if(buffer2[0]!='o' || buffer2[6]!=':'){
 	  color_set(RED_B, NULL);
 	  mvprintw(rows/2,0,"erreur : Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
 	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
@@ -244,8 +241,8 @@ int main(int argc, char **argv) {
 	}
 	
 	//COMPILER AVEC -g sinon erreur compil
-	strcpy(bufJoueurs,strchr(buffer, ':'));
-	if(strlen(buffer)==strlen(bufJoueurs)){
+	strcpy(bufJoueurs,strchr(buffer2, ':'));
+	if(strlen(buffer2)==strlen(bufJoueurs)){
 	  color_set(RED_B, NULL);
 	  mvprintw(rows/2,0,"erreur : mauvaise reception des autres joueurs");
 	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
@@ -258,21 +255,29 @@ int main(int argc, char **argv) {
 	joueur_i = strtok(bufJoueurs, ";");
 	do{
 	  tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
-	  printf("1-joueur i: %s\n", joueur_i);
-	  joueur_points = strtok(joueur_i, ",");
-	  printf("2-joueur p: %s\n", joueur_points);
-	  printf("2-joueur i: %s\n", joueur_i);
-	  strcpy(tabJoueurs[nbJoueurs]->nom, joueur_points);
-	  joueur_points = strtok(NULL, ",");
-	  printf("3-joueur p: %s\n", joueur_points);
-	  printf("3-joueur i: %s\n", joueur_i);
-	  strcpy(tabJoueurs[nbJoueurs]->points, joueur_points);
+	  strcpy(tabJoueurs[nbJoueurs]->nom, joueur_i);
 	  nbJoueurs++;
 	  joueur_i = strtok(NULL, ";");
-	  printf("4-joueur p: %s\n", joueur_points);
 	  printf("4-joueur i: %s\n", joueur_i);
-	}while (joueur_i !="." &&joueur_i != NULL);
-
+	}while (strcmp(joueur_i ,".")!=0 &&joueur_i != NULL);
+	
+	
+	int j;
+	for(j=0; j<nbJoueurs;j++){
+	  joueur_i = strtok(tabJoueurs[j]->nom, ",");
+	  strcpy(tabJoueurs[j]->nom, joueur_i);
+	  joueur_i = strtok(NULL, ",");
+    strcpy(tabJoueurs[j]->points,joueur_i);
+  }
+  
+  //Ca marche
+  /**
+  for(j=0; j<nbJoueurs;j++){
+    printf("nom : %s\n", tabJoueurs[j]->nom);
+    printf("joueur : %s\n", tabJoueurs[j]->points);
+    printf("-------\n");
+  }
+  */
   getch();
 	endwin();
     
