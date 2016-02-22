@@ -11,6 +11,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <netdb.h>
 #include <signal.h>
 #include <string.h>
+#include <errno.h> 
 
 typedef struct sockaddr 	sockaddr;
 typedef struct sockaddr_in 	sockaddr_in;
@@ -22,7 +23,24 @@ typedef struct joueur{
 }joueur;
 
 
-
+int str_to_int(const char *s, int *p) 
+{ 
+    int ret = 0; /* code d'erreur 0 : succès. */ 
+    if (*s == '\0') 
+        ret = 1; /* code d'erreur 1 : la chaine a convertir est vide. */ 
+    else 
+    { 
+        char *end; 
+        *p = (int)strtol(s, &end, 10); 
+  
+        if (errno != 0) 
+            ret = 2; /* code d'erreur 2 : la fonction strtol a rencontre une erreur. */ 
+        else if (*end != '\0') 
+            ret = 3; /* code d'erreur 3 : la conversion a échoué car un caractère invalide a été détecté. */ 
+    } 
+  
+    return ret; 
+}
 
 int main(int argc, char **argv) {
   
@@ -191,7 +209,7 @@ int main(int argc, char **argv) {
 	}while(taille_pseudo < 1|| taille_pseudo>10);
 	
  	mvprintw(2, 0, "Envoie de votre pseudo au serveur: %s", pseudo);
- 	if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
+ 	if ((write(socket_descriptor, pseudo, sizeof(pseudo))) < 0) {
  	  color_set(RED_B, NULL);
 	  mvprintw(rows/2,0,"erreur : impossible d'ecrire le message destine au serveur.");
 	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
@@ -221,13 +239,15 @@ int main(int argc, char **argv) {
 	char * joueur_i;
 	char * joueur_points;
 	char bufJoueurs[256];
-	char *buffer2;
-	buffer2 = malloc(256*sizeof(char));
-	if(read(socket_descriptor, buffer2, 256)<1){
+	char buffer2[256];
+	//buffer2 = malloc(256*sizeof(char));
+	bzero(buffer2,256);
+	printf("-\n");
+	if(read(socket_descriptor, buffer2, sizeof(buffer2))<1){
 	  printf("error\n");
 	};
 	
-	
+	//printf("-\n");
 	//Message : others:pseudoA,pointsA;pseudoB,pointsB;.
 	mvprintw(2, 0,"users : %s\n", buffer2);
 	getch();
@@ -239,7 +259,7 @@ int main(int argc, char **argv) {
 	  endwin();
 	  exit(1);
 	}
-	
+	//printf("-\n");
 	//COMPILER AVEC -g sinon erreur compil
 	strcpy(bufJoueurs,strchr(buffer2, ':'));
 	if(strlen(buffer2)==strlen(bufJoueurs)){
@@ -251,7 +271,6 @@ int main(int argc, char **argv) {
 	  exit(1);
 	}
 
-	free(buffer2);
 	joueur_i = strtok(bufJoueurs, ";");
 	do{
 	  tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
@@ -270,13 +289,45 @@ int main(int argc, char **argv) {
   }
   
   //Ca marche
-  /**
+  /*
   for(j=0; j<nbJoueurs;j++){
     printf("nom : %s\n", tabJoueurs[j]->nom);
-    printf("joueur : %s\n", tabJoueurs[j]->points);
+    printf("points : %s\n", tabJoueurs[j]->points);
     printf("-------\n");
   }
   */
+  
+  
+  //---------------------Taille mot-----------------------
+  char taille_mot_str[51];
+  bzero(taille_mot_str,51);
+  if(read(socket_descriptor, taille_mot_str, sizeof(taille_mot_str))<1){
+	  printf("error\n");
+	};
+	if(taille_mot_str[0]!='t' || taille_mot_str[13]!=':'){
+	  color_set(RED_B, NULL);
+	  mvprintw(rows/2,0,"erreur taille mot: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
+	  mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
+	  getch();
+	  endwin();
+	  exit(1);
+	}
+	strcpy(taille_mot_str,strchr(taille_mot_str, ':')+1);
+	printf("%s\n",taille_mot_str);
+	
+	int ret = str_to_long(taille_mot_str, &taille_mot); 
+    if (ret == 0){
+        printf("taille_mot = %d\n", taille_mot); 
+    }else{
+      color_set(RED_B, NULL);
+	    mvprintw(rows/2,0,"erreur taille mot: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
+	    mvprintw(rows - 2, cols - (33), "Pressez une touche pour terminer");
+	    getch();
+	    endwin();
+	    exit(1);
+	}
+	
+	
   getch();
 	endwin();
     
@@ -288,7 +339,7 @@ int main(int argc, char **argv) {
       printf("\nmessage  a envoye   :\n");
       scanf("%s", mesg);
       /* envoi du message vers le serveur */
-      if ((write(socket_descriptor, mesg, strlen(mesg))) < 0) {
+      if ((write(socket_descriptor, mesg, sizeof(mesg))) < 0) {
 	  perror("erreur : impossible d'ecrire le message destine au serveur.");
 	  exit(1);
       }

@@ -78,7 +78,7 @@ void init_pseudo(thread_socket* tSock){
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
     
-    write(tSock->socket,repPseudo,strlen(repPseudo)+1);
+    write(tSock->socket,repPseudo,sizeof(repPseudo));
   }
 }
 
@@ -103,9 +103,18 @@ void init_others(thread_socket *tSock){
 	
 	strcpy(buffer2,buffer); // evite une erreur d'optimisation du compilo
 	// en fait non pas toujours
-	write(tSock->socket,buffer2,sizeof(buffer2)+1);
+	write(tSock->socket,buffer2,sizeof(buffer2));
 	
 
+}
+void init_mot(thread_socket *tSock){
+  char buff[50] ="taille du mot:";
+  char str[5];
+	sprintf(str,"%d",strlen(lettres.mot));
+  strcat(buff, str);
+  write(tSock->socket,buff,sizeof(buff));
+  printf("%s\n", buff);
+  
 }
 /*
 void init_lettres(thread_socket *tSock){
@@ -118,17 +127,18 @@ void init_lettres(thread_socket *tSock){
             strcat(buffer,c.lettre);
             strcat(buffer,'{');
             for(int i : c.position){
-                strcat(buffer,i);
+                char str[5];
+	              sprintf(str,"%d",i);
+                strcat(buffer, str);
                 strcat(buffer,",");
             }
             strcat(buffer,'}');
             
         }
     }
+    write(tSock->socket,buffer,sizeof(buffer)+1);
+}*/
 
-}
-
-*/
 void initialisation(thread_socket* tSock){
   tSock->points = 10;
 	init_pseudo(tSock);
@@ -137,8 +147,9 @@ void initialisation(thread_socket* tSock){
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses points
 	init_others(tSock);
+	init_mot(tSock);
   char buffer[256];
-  read(tSock->socket,buffer,sizeof(buffer)+1);
+  read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
 	
@@ -171,7 +182,7 @@ void renvoi (int sock) {
         /* mise en attente du prgramme pour simuler un delai de transmission */
         sleep(3);
 
-        write(sock,res,strlen(res)+1);
+        write(sock,res,sizeof(res));
 
     }   
     return;

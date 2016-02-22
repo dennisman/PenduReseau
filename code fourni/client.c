@@ -38,7 +38,6 @@ int main(int argc, char **argv) {
     printf("nom de l'executable : %s \n", prog);
     printf("adresse du serveur  : %s \n", host);
     printf("message envoye      : %s \n", mesg);
-    
     if ((ptr_host = gethostbyname(host)) == NULL) {
 	perror("erreur : impossible de trouver le serveur a partir de son adresse.");
 	exit(1);
@@ -64,7 +63,7 @@ int main(int argc, char **argv) {
     
     /*-----------------------------------------------------------*/
     /* SOLUTION 2 : utiliser un nouveau numero de port */
-    adresse_locale.sin_port = htons(5042);
+    adresse_locale.sin_port = htons(5000);
     /*-----------------------------------------------------------*/
     
     printf("numero de port pour la connexion au serveur : %d \n", ntohs(adresse_locale.sin_port));
@@ -99,7 +98,7 @@ int main(int argc, char **argv) {
     /* lecture de la reponse en provenance du serveur */
     while((longueur = read(socket_descriptor, buffer, sizeof(buffer))) > 0) {
 	printf("reponse du serveur : \n");
-	write(1,buffer,longueur);
+	printf("%s",buffer);
     }
     
     printf("\nfin de la reception. %d\n", socket_descriptor);
