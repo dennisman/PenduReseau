@@ -78,7 +78,7 @@ void init_pseudo(thread_socket* tSock){
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
     
-    write(tSock->socket,repPseudo,strlen(repPseudo));
+    write(tSock->socket,repPseudo,sizeof(repPseudo));
   }
 }
 
@@ -116,7 +116,7 @@ void init_mot(thread_socket *tSock){
   printf("%s\n", buff);
   
 }
-/*
+
 void init_lettres(thread_socket *tSock){
 
     char buffer[200]="lettresTrouvees:";
@@ -136,8 +136,8 @@ void init_lettres(thread_socket *tSock){
             
         }
     }
-    write(tSock->socket,buffer,sizeof(buffer)+1);
-}*/
+    write(tSock->socket,buffer,sizeof(buffer));
+}
 
 void initialisation(thread_socket* tSock){
   tSock->points = 10;
@@ -182,7 +182,7 @@ void renvoi (int sock) {
         /* mise en attente du prgramme pour simuler un delai de transmission */
         sleep(3);
 
-        write(sock,res,strlen(res));
+        write(sock,res,sizeof(res));
 
     }   
     return;

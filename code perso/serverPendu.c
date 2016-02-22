@@ -116,7 +116,7 @@ void init_mot(thread_socket *tSock){
   printf("%s\n", buff);
   
 }
-/*
+
 void init_lettres(thread_socket *tSock){
 
     char buffer[200]="lettresTrouvees:";
@@ -136,8 +136,8 @@ void init_lettres(thread_socket *tSock){
             
         }
     }
-    write(tSock->socket,buffer,sizeof(buffer)+1);
-}*/
+    write(tSock->socket,buffer,sizeof(buffer));
+}
 
 void initialisation(thread_socket* tSock){
   tSock->points = 10;
@@ -148,6 +148,7 @@ void initialisation(thread_socket* tSock){
 	//son pseudo et ses points
 	init_others(tSock);
 	init_mot(tSock);
+	init_lettres(tSock);
   char buffer[256];
   read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
