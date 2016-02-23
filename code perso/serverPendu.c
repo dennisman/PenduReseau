@@ -121,7 +121,7 @@ void init_lettres(thread_socket *tSock){
 
     char buffer[200]="lettresTrouvees:";
     
-    //Message : lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,};lettresFausses:lettre1,lettre2.
+    //Message : lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,},;lettresFausses:lettre1,lettre2,.
     for(lettre_commun c : lettres.lettre_trouve_vrai){
         if(c.lettre != '0'){
             strcat(buffer,c.lettre);
@@ -133,7 +133,10 @@ void init_lettres(thread_socket *tSock){
                 strcat(buffer,",");
             }
             strcat(buffer,'}');
-            
+            /*TODO TROP CHIANT ENVOYER LE MOT _A_F___D plutot
+            //Message : lettresTrouvees:O_DI__T_UR;lettresFausses:lettre1,lettre2,.
+ en plus pas besoin d'envoyé la taille du mot avant*/
+//TODO lettresFAUSSES
         }
     }
     write(tSock->socket,buffer,sizeof(buffer));

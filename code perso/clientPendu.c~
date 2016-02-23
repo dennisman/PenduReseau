@@ -12,7 +12,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <signal.h>
 #include <string.h>
 #include <errno.h> 
-
+#include "Letters.c"
 typedef struct sockaddr 	sockaddr;
 typedef struct sockaddr_in 	sockaddr_in;
 typedef struct hostent 		hostent;
@@ -119,6 +119,7 @@ int main(int argc, char **argv) {
 	
 	//--------------------DEFINITION DES VARIABLES DE JEU----------------------- 
 	char actualWord[27];
+	int bool_mot_incomplet = 1;
 	int taille_mot;
 	char word[27];
 	char hangman[300] = {0};
@@ -307,7 +308,7 @@ int main(int argc, char **argv) {
 	
 	
 	//----------------Lettres données-----------------------
-	//Message : lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,};lettresFausses:lettre1,lettre2.
+	//lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,},;lettresFausses:lettre1,lettre2,.
 	
 	
 	char buff_lettres[200];
@@ -321,7 +322,7 @@ int main(int argc, char **argv) {
 	
 	char lettresTrouvees[150];
 	lettresTrouvees[0]= strtok(buff_lettres, ";");
-	char lettresFausses[150];
+	char lettresFausses[50];
 	lettresFausses[0]= strtok(NULL, ".");
 	
 	strcpy(lettresFausses,strchr(lettresFausses, ':')+1);
@@ -329,7 +330,56 @@ int main(int argc, char **argv) {
 	printf("Trouvées %s/n",lettresTrouvees);
 	printf("Fausses %s/n",lettresFausses);
 	
+	//LETTRES FAUSSES
+	char* lettre_fausse_i;
+	lettre_fausse_i = malloc(sizeof(char));
+	lettre_fausse_i = strtok(lettresFausses, ",");
+	while(strcmp(lettre_fausse_i, ".")!=0){
+	  //on enleve les vies et on dessine le pendu
+	  lives--;
+	  //dessin du pendu ici
+	  
+	  addLetter(lettre_fausse_i[0], letters);
+	  lettre_fausse_i = strtok(NULL, ",");
+	}
+	free(lettre_fausse_i);
 	
+	//LETTRES OK
+	//TODO TROP CHIANT ENVOYER LE MOT _A_F___D plutot
+	/*char* lettre_ok_i;
+	lettre_ok_i = malloc(15*sizeof(char));
+	lettre_ok_i = strtok(lettresTrouvees, ",");
+	while(strcmp(lettre_ok_i, ".")!=0){
+	  lettre_ok_i = strtok(NULL, ",");
+	}
+	free(lettre_ok_i);
+	*/
+	box(winHangman, ACS_VLINE, ACS_HLINE);
+
+	mvwprintw(winWord, 0, 0, "%s", actualWord);
+	mvwprintw(winLives, 0, 0, "Lives : %d", lives);
+
+	wrefresh(winHangman);
+	wrefresh(winWord);
+	wrefresh(winLives);
+	
+	/*FAIRE 2 THREAD,
+	- 1 qui demande a ce client les lettres
+	- l'autre qui s'occupe des reponses des autres clients*/
+	
+	void *threadOthers(void * p_data){
+	  while(bool_mot_incomplet && lives > 0){
+	    read(socket_descriptor, readChar, sizeof(readChar));
+	    
+	  }
+	}
+	
+	void *threadThisGamer(void * p_data){
+	  while(bool_mot_incomplet && lives > 0){
+	    scannedChar = toupper(getch());
+	    
+	  }
+	}
 	
 	
   getch();
