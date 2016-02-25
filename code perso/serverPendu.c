@@ -122,11 +122,9 @@ void init_lettres(thread_socket *tSock){
     char buffer[200]="lettresTrouvees:";
     
     char tmp[200] = lettres.motHache; 
-   
-            /*TODO TROP CHIANT ENVOYER LE MOT _A_F___D plutot
-            //Message : lettresTrouvees:O_DI__T_UR;lettresFausses:lettre1,lettre2,.
- en plus pas besoin d'envoyé la taille du mot avant*/
-//TODO lettresFAUSSES
+   strcat(buffer,tmp);
+   strcat(buffer,lettres.lettre_trouve_fausse);
+    
 
     write(tSock->socket,buffer,sizeof(buffer));
 }
