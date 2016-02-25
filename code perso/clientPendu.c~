@@ -251,7 +251,7 @@ int main(int argc, char **argv) {
 	}
 	//printf("-\n");
 	//COMPILER AVEC -g sinon erreur compil
-	strcpy(bufJoueurs,strchr(buffer2, ':'));
+	strcpy(bufJoueurs,strchr(buffer2, ':')/*+1*/); // pe +1
 	if(strlen(buffer2)==strlen(bufJoueurs)){
 	  err("erreur : mauvaise reception des autres joueurs");
 	  
@@ -364,9 +364,10 @@ int main(int argc, char **argv) {
 	wrefresh(winLives);
 	
 	/*FAIRE 2 THREAD,
-	- 1 qui demande a ce client les lettres
-	- l'autre qui s'occupe des reponses des autres clients*/
-	
+	- 1 qui demande a ce client les lettres puis envoie au serveur la lettre
+	- l'autre qui s'occupe des reponses des autres clients et nouvelles (dé)connexions envoyer par le serveur 
+	*/
+	/*
 	void *threadOthers(void * p_data){
 	  while(bool_mot_incomplet && lives > 0){
 	    read(socket_descriptor, readChar, sizeof(readChar));
@@ -380,7 +381,7 @@ int main(int argc, char **argv) {
 	    
 	  }
 	}
-	
+	*/
 	
   getch();
 	endwin();

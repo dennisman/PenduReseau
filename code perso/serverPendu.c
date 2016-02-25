@@ -29,7 +29,7 @@ typedef struct lettre_commun {
 
     char mot[27];// = {0};
     char lettre_trouve_fausse[26];// = {0};
-    lettre_num lettre_trouve_vrai[26];
+    char motHache[27]; //_héo
 
 }lettre_commun;
 
@@ -121,24 +121,13 @@ void init_lettres(thread_socket *tSock){
 
     char buffer[200]="lettresTrouvees:";
     
-    //Message : lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,},;lettresFausses:lettre1,lettre2,.
-    for(lettre_commun c : lettres.lettre_trouve_vrai){
-        if(c.lettre != '0'){
-            strcat(buffer,c.lettre);
-            strcat(buffer,'{');
-            for(int i : c.position){
-                char str[5];
-	              sprintf(str,"%d",i);
-                strcat(buffer, str);
-                strcat(buffer,",");
-            }
-            strcat(buffer,'}');
+    char tmp[200] = lettres.motHache; 
+   
             /*TODO TROP CHIANT ENVOYER LE MOT _A_F___D plutot
             //Message : lettresTrouvees:O_DI__T_UR;lettresFausses:lettre1,lettre2,.
  en plus pas besoin d'envoyé la taille du mot avant*/
 //TODO lettresFAUSSES
-        }
-    }
+
     write(tSock->socket,buffer,sizeof(buffer));
 }
 
@@ -151,7 +140,7 @@ void initialisation(thread_socket* tSock){
 	//son pseudo et ses points
 	init_others(tSock);
 	init_mot(tSock);
-	init_lettres(tSock);
+	//init_lettres(tSock);
   char buffer[256];
   read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
@@ -234,7 +223,6 @@ main(int argc, char **argv) {
 		  //------------1ere etape------------------
 		  //envoi des données pour que le client puisse initialiser le jeu
 		  initialisation(thread_sock);
-		  printf("lol\n");
 		  //------------2e etape------------------
 		  // echanges avec le client
 		  //play(*sock_des)
