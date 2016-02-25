@@ -121,8 +121,7 @@ void init_lettres(thread_socket *tSock){
 
     char buffer[200]="lettresTrouvees:";
     
-    char tmp[200] = lettres.motHache; 
-   strcat(buffer,tmp);
+   strcat(buffer,lettres.motHache);
    strcat(buffer,lettres.lettre_trouve_fausse);
     
 
@@ -138,7 +137,7 @@ void initialisation(thread_socket* tSock){
 	//son pseudo et ses points
 	init_others(tSock);
 	init_mot(tSock);
-	//init_lettres(tSock);
+	init_lettres(tSock);
   char buffer[256];
   read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
