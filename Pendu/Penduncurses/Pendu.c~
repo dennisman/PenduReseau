@@ -16,6 +16,7 @@ int main()
 	WINDOW *winWord;
 	WINDOW *winLives;
 	WINDOW *winLetters;
+	WINDOW *others;
 
 	time_t startBlinkTime = time(NULL);
 	time_t timeOfNow = time(NULL);
