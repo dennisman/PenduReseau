@@ -11,6 +11,9 @@ Serveur à lancer avant le client
 #include <pthread.h> 
 #include <ctype.h>
 
+#include "../Pendu/dico.c"
+#include "Letters.c"
+
 #define TAILLE_MAX_NOM 256
 
 typedef struct sockaddr sockaddr;
@@ -202,6 +205,33 @@ void renvoi (int sock) {
 main(int argc, char **argv) {
   
   
+  int j = 0;
+  char letters[26];char a = 'A';
+  while( a <= 'Z' )
+	{
+		
+			letters[j] = a;
+		
+
+		j++;
+		a++;
+	}
+  
+  
+	piocherMot(lettres.mot);
+	
+	printf(lettres.mot);
+	int i =0;
+	while( i < 27){
+		if(checkLetter2(lettres.mot[i]) != -1){
+			lettres.motHache[i] = '_';
+		}else{
+			lettres.motHache[i] = '\0';
+		}
+		i++;
+	}
+	printf(lettres.motHache);
+	
 
     printf("\n     __________\n");
     printf("     | //      |\n");

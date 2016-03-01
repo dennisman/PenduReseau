@@ -8,7 +8,7 @@ void initLetters(char letters[])
 
 	for(i = 0; i < 26; i++)
 	{
-		letters[i] = ' ';
+		letters[i] = '_';
 	}
 
 	letters[27] = '\0';
@@ -24,6 +24,22 @@ int checkLetter(char letter, char letters[])
 		if(letters[i] == letter)
 		{
 			isTheSame = i;
+		}
+	}
+
+	return isTheSame;
+}
+
+int checkLetter2(char letter)
+{
+	char i;
+	int isTheSame = -1;
+
+	for(i = 'A'; i <= 'Z'; i++)
+	{
+		if(i == letter)
+		{
+			isTheSame = 0;
 		}
 	}
 

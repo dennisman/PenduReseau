@@ -20,7 +20,7 @@ int piocherMot(char *motPioche)
     FILE* dico = NULL; // Le pointeur de fichier qui va contenir notre fichier
     int nombreMots = 0, numMotChoisi = 0, i = 0;
     int caractereLu = 0;
-    dico = fopen("dico.txt", "r"); // On ouvre le dictionnaire en lecture seule
+    dico = fopen("../Pendu/dico.txt", "r"); // On ouvre le dictionnaire en lecture seule
 
     // On vérifie si on a réussi à ouvrir le dictionnaire
     if (dico == NULL) // Si on n'a PAS réussi à ouvrir le fichier
