@@ -77,7 +77,8 @@ void init_pseudo(thread_socket* tSock, char* buffer){
     
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
-	strcat(buffer, repPseudo);
+	  strcpy(buffer, pseudo);
+	  printf("ok\n");
     
     //write(tSock->socket,repPseudo,sizeof(repPseudo));
   }
@@ -101,9 +102,9 @@ void init_others(char* buffer2){
 	strcat(buffer,".");
 	printf ("users : %s\n", buffer);
 	
-	strcpy(buffer2,buffer);
+	strcat(buffer2,buffer);
 	//write(tSock->socket,buffer2,sizeof(buffer2));
-	
+	  printf("ok\n");
 
 }
 void init_mot(char* buffer){
@@ -122,27 +123,36 @@ void init_lettres(char* buffer){
     char buffer2[200]="lettresTrouvees:";
     
    strcat(buffer2,lettres.motHache);
+   strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
     strcat(buffer, buffer2);
-
+    strcat(buffer2,".");
+    printf("ok\n");
     //write(tSock->socket,buffer,sizeof(buffer));
 }
 
 void initialisation(thread_socket* tSock){
   tSock->points = 10;
-  char buffer[500];
+  char buffer[500]="";
   char dollar[1] = "$";
+  printf("oui%s\n",buffer);
 	init_pseudo(tSock, buffer);
-	strcat(buffer,dollar);
-	
+	printf("oui%s\n",buffer);
+	strcat(buffer,"$");
+	printf("oui%s\n",buffer);
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses points
+	printf("oui%s\n",buffer);
 	init_others(buffer);
-	strcat(buffer,dollar);
-	init_mot(buffer);
-	strcat(buffer,dollar);
+	printf("oui%s\n",buffer);
+	strcat(buffer,"$");
+	printf("oui%s\n",buffer);
+	//init_mot(buffer);
+	//strcat(buffer,dollar);
 	init_lettres(buffer);
+	printf("oui%s\n",buffer);
+	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,sizeof(buffer));
   read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
