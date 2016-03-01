@@ -199,25 +199,9 @@ void renvoi (int sock) {
     return;
     
 }
-/*------------------------------------------------------*/
 
-/*------------------------------------------------------*/
-main(int argc, char **argv) {
-  
-  
-  int j = 0;
-  char letters[26];char a = 'A';
-  while( a <= 'Z' )
-	{
-		
-			letters[j] = a;
-		
+void initialisationMot(){
 
-		j++;
-		a++;
-	}
-  
-  
 	piocherMot(lettres.mot);
 	
 	printf(lettres.mot);
@@ -231,6 +215,44 @@ main(int argc, char **argv) {
 		i++;
 	}
 	printf(lettres.motHache);
+}
+
+void pendu(char lettrePropose){
+	unsigned int i;
+	int trouver = 0;
+
+	for(i = 0; i <= strlen(lettres.mot); i++)
+	{
+		if(lettres.mot[i] == lettrePropose)
+		{
+			lettres.motHache[i] = lettres.mot[i];
+			trouver = 1;
+		}
+	}
+	
+	if(trouver = 0){
+		for(i = 0; i < 26; i++) {
+			if(lettrePropose == lettres.lettre_trouve_fausse[i]){
+				trouver = 2;
+				//dire que la lettre a deja ete propose
+			}
+			if(trouver == 0 && lettres.lettre_trouve_fausse[i] == '\0'){
+				lettres.lettre_trouve_fausse[i] = lettrePropose;
+				i = 27;
+			}
+		}
+		
+	}
+
+	
+}
+/*------------------------------------------------------*/
+
+/*------------------------------------------------------*/
+main(int argc, char **argv) {
+  
+  initialisationMot();
+  
 	
 
     printf("\n     __________\n");
