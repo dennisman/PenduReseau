@@ -123,11 +123,13 @@ void init_lettres(char* buffer){
     char buffer2[200]="lettresTrouvees:";
     
    strcat(buffer2,lettres.motHache);
+   //strcat(buffer2,"abc"); //pour debugage client
    strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
-    strcat(buffer, buffer2);
-    strcat(buffer2,".");
-    printf("ok\n");
+   //strcat(buffer2,"def");//pour debugage client
+   strcat(buffer2,".");
+   strcat(buffer, buffer2);
+    
     //write(tSock->socket,buffer,sizeof(buffer));
 }
 
@@ -151,6 +153,7 @@ void initialisation(thread_socket* tSock){
 	//init_mot(buffer);
 	//strcat(buffer,dollar);
 	init_lettres(buffer);
+	strcat(buffer,"$");
 	printf("oui%s\n",buffer);
 	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,sizeof(buffer));

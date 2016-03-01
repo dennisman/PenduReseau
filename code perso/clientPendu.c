@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
         color_set(WHITE_B, NULL);
       }
     }while(taille_pseudo < 1|| taille_pseudo>10);
-
+    printf("ok\n");
     mvprintw(2, 0, "Envoie de votre pseudo au serveur: %s", pseudo);
     if ((write(socket_descriptor, pseudo, sizeof(pseudo))) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
@@ -176,6 +176,7 @@ int main(int argc, char **argv) {
     mvprintw(rows - 2, 0, ">%s", pseudo);
 
     getch();*///supp car on read tout d'un coup
+    printf("ok\n");
   }
 
   void demandeJoueurs(char buffer2[]){
@@ -188,8 +189,7 @@ int main(int argc, char **argv) {
     char bufJoueurs[256];
 
     //buffer2 = malloc(256*sizeof(char));
-    bzero(buffer2,256);
-    printf("-\n");
+   
     /*if(read(socket_descriptor, buffer2, sizeof(buffer2))<1){
     printf("error\n");};*/ //supp car on read tout d'un coup
 
@@ -244,17 +244,20 @@ int main(int argc, char **argv) {
       err("erreur lettres: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
     }
     strcpy(buff_lettres,strchr(buff_lettres, ':')+1);
-
-    char lettresTrouvees[150];
-    lettresTrouvees[0]= strtok(buff_lettres, ";");
-    char lettresFausses[50];
-    lettresFausses[0]= strtok(NULL, ".");
-
+    char* lettresTrouvees;
+    lettresTrouvees=malloc(50*sizeof(char));
+    lettresTrouvees= strtok(buff_lettres, ".");
+    char* lettresFausses;
+    lettresFausses=malloc(26*sizeof(char));
+    lettresFausses= strtok(NULL, ".");
+    printf("Trouvées %s\n",lettresTrouvees);
+    printf("Fausses %s\n",lettresFausses);
+    
     strcpy(lettresFausses,strchr(lettresFausses, ':')+1);
-
-    printf("Trouvées %s/n",lettresTrouvees);
-    printf("Fausses %s/n",lettresFausses);
-
+    
+    printf("Trouvées %s\n",lettresTrouvees);
+    printf("Fausses %s\n",lettresFausses);
+/*
     //LETTRES FAUSSES
     char* lettre_fausse_i;
     lettre_fausse_i = malloc(sizeof(char));
@@ -268,7 +271,7 @@ int main(int argc, char **argv) {
       lettre_fausse_i = strtok(NULL, ",");
     }
     free(lettre_fausse_i);
-
+*/
   }
 
   void *threadOthers(){
@@ -302,28 +305,52 @@ int main(int argc, char **argv) {
   	}
   }
   void initialisation(){
-    char grandBuf[600];
-
+    char grandBuf[500];
+   
+    
     demandePseudo();
+    clear();
+    refresh();
+   
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
-    
+    mvprintw(10,0,"grandbuff: %s",grandBuf);
+    getch();
     //lancement du thread d'ecoute du serveur
-    if( pthread_create( &(id_threadOthers) , NULL ,  threadOthers , NULL) < 0){
+    /*if( pthread_create( &(id_threadOthers) , NULL ,  threadOthers , NULL) < 0){
 		perror("could not create thread for other clients");
 		return 1;  
-	}
-		    
+	}*/
+	  char* copie;
+    copie = malloc(500*sizeof(char));
+		strcpy(copie , grandBuf);
     char* bufTmp;
     bufTmp = malloc(200*sizeof(char));
     strcpy(bufTmp , strtok(grandBuf,"$"));
-    demandeJoueurs(bufTmp);
-
-
+    mvprintw(0,0,"Votre pseudo sera: %s",bufTmp);
+    mvprintw(1,0,"grandbuff: %s",grandBuf);
+    getch();
+    
     strcpy(bufTmp , strtok(NULL,"$"));
+    mvprintw(2,0,"bufftmp: %s",bufTmp);
+    getch();
+    demandeJoueurs(bufTmp);
+    mvprintw(3,0,"les autres joueurs: %s",bufTmp);
+    getch();
+    clear();
+    refresh();
+    strcpy(bufTmp , strtok(copie,"$"));
+    strcpy(bufTmp , strtok(NULL,"$"));
+    strcpy(bufTmp , strtok(NULL,"$"));
+    
+    mvprintw(4,0,"les lettres: %s",bufTmp);
+    getch();
+    clear();
+    refresh();
     demandeLettres(bufTmp);
 
+    
   }
 
   
