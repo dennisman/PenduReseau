@@ -129,7 +129,7 @@ void init_lettres(char* buffer){
    //strcat(buffer2,"ABC"); //pour debugage client
    strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
-   //strcat(buffer2,"DEF");//pour debugage client
+   strcat(buffer2,"DEF");//pour debugage client
    strcat(buffer2,".");
    strcat(buffer, buffer2);
     
@@ -294,6 +294,7 @@ main(int argc, char **argv) {
 		  // echanges avec le client
 		  //play(*sock_des)
 		  //renvoi(*sock_des);
+		  sleep(50);
 		  close(thread_sock->socket );
 		  (void) p_data;
       return NULL;

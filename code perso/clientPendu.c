@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
       taille_pseudo = strlen(pseudo);
       if(taille_pseudo < 1|| taille_pseudo>10){
         color_set(RED_B, NULL);
-        mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères\nPseudo:");
+        mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères");
         mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
         color_set(WHITE_B, NULL);
         
@@ -204,7 +204,7 @@ int main(int argc, char **argv) {
       err("erreur : Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
     }
     //COMPILER AVEC -g sinon erreur compil
-    strcpy(bufJoueurs,strchr(buffer2, ':')/*+1*/); // pe +1
+    strcpy(bufJoueurs,strchr(buffer2, ':')+1); // pe +1
     if(strlen(buffer2)==strlen(bufJoueurs)){
       err("erreur : mauvaise reception des autres joueurs");
 
@@ -268,12 +268,32 @@ int main(int argc, char **argv) {
     ligne_init++;
     
   }
+  void aff_score(){
+    werase(winOthers);
+    wrefresh(winOthers);
+    int i;
+    char nomJ[15];
+    for(i=0; i<nbJoueurs;i++){
+      strcpy(nomJ, tabJoueurs[i]->nom);
+      if(strcmp(nomJ, pseudo)==0){
+       wcolor_set(winOthers,GREEN_B,NULL);
+        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
+        wcolor_set(winOthers,WHITE_B,NULL);
+      }else{
+        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
+      }
+    }
+    box(winOthers, ACS_VLINE, ACS_HLINE);
+    wrefresh(winOthers);
+  }
 
   void *threadOthers(){
+    
   	char recu[200];
     while(bool_mot_incomplet && lives > 0){
-    	bzero(recu,200);
-    	read(socket_descriptor, recu, sizeof(recu));
+    	if(read(socket_descriptor, recu, sizeof(recu))<1){
+      printf("error read sock\n");
+      }
     	char typeMsg = recu[0];
     	if (strcmp(recu[1],":")!=0){
     		// erreur de reception
@@ -308,13 +328,14 @@ int main(int argc, char **argv) {
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
-    //pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
+    pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
 	  char* copie;
     copie = malloc(500*sizeof(char));
 		strcpy(copie , grandBuf);
     char* bufTmp;
     bufTmp = malloc(200*sizeof(char));
     strcpy(bufTmp , strtok(grandBuf,"$"));
+    strcpy(pseudo,bufTmp);
     mvprintw(ligne_init,0,"Votre pseudo sera: %s",bufTmp);
     ligne_init++;
 
@@ -397,61 +418,66 @@ int main(int argc, char **argv) {
 	winWord = newwin(1, strlen(word), rows/2, (cols-strlen(word))/2);
 	winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
 	winLetters = newwin(1, 26, 0, 0);
-	winOthers = newwin(nbJoueurs,16,3,1);
+	winOthers = newwin(nbJoueurs+2,17,3,1);
 	
   box(winHangman, ACS_VLINE, ACS_HLINE);
-  box(winOthers, ACS_VLINE, ACS_HLINE);
+  
   mvwprintw(winWord, 0, 0, "%s", word);
-  mvwprintw(winLives, 0, 0, "Lives : %d", lives);
+  mvwprintw(winLives, 0, 0, "vies : %d", lives);
+  mvwprintw(winLetters, 0, 0, "%s", letters);
+  wrefresh(winLetters);
   wrefresh(winHangman);
   wrefresh(winWord);
   wrefresh(winLives);
-  wrefresh(winOthers);
+  aff_score();
   refresh();
-  sleep(5);
 
     char scannedChar = 0;
   	char oldScannedChar = 0;
 
     while(bool_mot_incomplet && lives > 0){
-		scannedChar = toupper(getch());
-		if(scannedChar >= 'A' && scannedChar <= 'Z'){
-			if(checkLetter(scannedChar, letters) == -1){
-				//envoyer au serveur	
-				if(isWarningDone==1){
-					alreadyWroteIndex = checkLetter(scannedChar, letters);
-					alreadyWroteLetter = scannedChar;
-					wattrset(winLetters, A_REVERSE);
-					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-					wattroff(winLetters, A_REVERSE);
-					wrefresh(winLetters);
-					startBlinkTime = time(NULL);
-					isWarningDone = 0;
-				}else{
-					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+      nodelay(winHangman, 1);
+		  scannedChar = toupper(wgetch(winHangman));
+		  nodelay(winHangman, 0);
+		  if(scannedChar >= 'A' && scannedChar <= 'Z'){
+			  if(checkLetter(scannedChar, letters) == -1){
+				  //envoyer au serveur
+					
+				
+			  }else{
+				  //faire clignoter la lettre
+				  if(isWarningDone){
+					  alreadyWroteIndex = checkLetter(scannedChar, letters);
+					  alreadyWroteLetter = scannedChar;
+					  wattrset(winLetters, A_REVERSE);
+					  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+					  wattroff(winLetters, A_REVERSE);
+					  wrefresh(winLetters);
+					  startBlinkTime = time(NULL);
+					  isWarningDone = false;
+				  }else{
+					  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
 
-					alreadyWroteIndex = checkLetter(scannedChar, letters);
-					alreadyWroteLetter = scannedChar;
-					wattrset(winLetters, A_REVERSE);
-					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-					wattroff(winLetters, A_REVERSE);
-					wrefresh(winLetters);
-					startBlinkTime = time(NULL);
-				}	
-			}else{
-				//faire clignoter la lettre
-			}
-		}
+					  alreadyWroteIndex = checkLetter(scannedChar, letters);
+					  alreadyWroteLetter = scannedChar;
+					  wattrset(winLetters, A_REVERSE);
+					  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+					  wattroff(winLetters, A_REVERSE);
+					  wrefresh(winLetters);
+					  startBlinkTime = time(NULL);
+				  }
+			  }
+		  }
 		
-		if(isWarningDone==0){
-			timeOfNow = time(NULL);
-			if(difftime(timeOfNow, startBlinkTime) >= 2){
-				wattroff(winLetters, A_REVERSE);
-				mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-				wrefresh(winLetters);
-				isWarningDone = 1;
-			}
-		}
+		  if(isWarningDone==0){
+			  timeOfNow = time(NULL);
+			  if(difftime(timeOfNow, startBlinkTime) >= 2){
+				  wattroff(winLetters, A_REVERSE);
+				  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+				  wrefresh(winLetters);
+				  isWarningDone = 1;
+			  }
+		  }
 	}
 
 
