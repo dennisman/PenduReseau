@@ -14,6 +14,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <string.h>
 #include <errno.h>
 #include "Letters.c"
+#include "DrawHangman.c"
 
 #define HANGMAN_HEIGHT 12
 #define HANGMAN_WIDTH 20
@@ -68,6 +69,7 @@ int main(int argc, char **argv) {
   {
     if (signo == SIGINT)
     closeEcoute();
+    curs_set(1);
     endwin();
     exit(1);
   }
@@ -287,6 +289,12 @@ int main(int argc, char **argv) {
     wrefresh(winOthers);
   }
 
+  void aff_hangman(){
+    readHangman(hangman, ((lives-10)*-1));
+	  printHangman(winHangman, 1, 2, hangman);
+	  box(winHangman, ACS_VLINE, ACS_HLINE);
+	  wrefresh(winHangman);
+	}
   void *threadOthers(){
     
   	char recu[200];
@@ -414,6 +422,9 @@ int main(int argc, char **argv) {
   
   clear();
   refresh();
+  raw();
+	noecho();
+	curs_set(0);
   winHangman = newwin(HANGMAN_HEIGHT + 4, HANGMAN_WIDTH + 4, 0, cols - 24);
 	winWord = newwin(1, strlen(word), rows/2, (cols-strlen(word))/2);
 	winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
@@ -426,7 +437,10 @@ int main(int argc, char **argv) {
   mvwprintw(winLives, 0, 0, "vies : %d", lives);
   mvwprintw(winLetters, 0, 0, "%s", letters);
   wrefresh(winLetters);
-  wrefresh(winHangman);
+  
+  
+	aff_hangman();
+  
   wrefresh(winWord);
   wrefresh(winLives);
   aff_score();
@@ -469,7 +483,7 @@ int main(int argc, char **argv) {
 			  }
 		  }
 		
-		  /*if(isWarningDone==0){
+		  if(isWarningDone==0){
 			  timeOfNow = time(NULL);
 			  if(difftime(timeOfNow, startBlinkTime) >= 2){
 				  wattroff(winLetters, A_REVERSE);
@@ -477,7 +491,7 @@ int main(int argc, char **argv) {
 				  wrefresh(winLetters);
 				  isWarningDone = 1;
 			  }
-		  }*/
+		  }
 	}
 
 
