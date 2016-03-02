@@ -46,16 +46,18 @@ int checkLetter2(char letter)
 	return isTheSame;
 }
 
-void addLetter(char letter, char letters[])
+void addLetter(char letter, char* letters)
 {
 	int i;
 	int j = 0;
 
 	for(i = 'A'; i <= 'Z'; i++)
 	{
+	  //printf("lettre : %c, i = %c\n",letter, i);
 		if (letter == i)
-		{
+		{ 
 			letters[j] = letter;
+			break;
 		}
 
 		j++;

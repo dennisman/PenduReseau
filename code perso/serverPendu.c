@@ -126,10 +126,10 @@ void init_lettres(char* buffer){
     char buffer2[200]="lettresTrouvees:";
     
    strcat(buffer2,lettres.motHache);
-   //strcat(buffer2,"abc"); //pour debugage client
+   //strcat(buffer2,"ABC"); //pour debugage client
    strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
-   //strcat(buffer2,"def");//pour debugage client
+   //strcat(buffer2,"DEF");//pour debugage client
    strcat(buffer2,".");
    strcat(buffer, buffer2);
     

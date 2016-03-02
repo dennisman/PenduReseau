@@ -14,6 +14,12 @@ client <adresse-serveur> <message-a-transmettre>
 #include <string.h>
 #include <errno.h>
 #include "Letters.c"
+
+#define HANGMAN_HEIGHT 12
+#define HANGMAN_WIDTH 20
+
+#define true 1
+#define false 0
 typedef struct sockaddr 	sockaddr;
 typedef struct sockaddr_in 	sockaddr_in;
 typedef struct hostent 		hostent;
@@ -82,7 +88,7 @@ int main(int argc, char **argv) {
   WINDOW *winWord;
   WINDOW *winLives;
   WINDOW *winLetters;
-  WINDOW *others;
+  WINDOW *winOthers;
   int rows = 0;
   int cols = 0;
   initscr();
@@ -119,12 +125,16 @@ int main(int argc, char **argv) {
 
 
   //--------------------DEFINITION DES VARIABLES DE JEU-----------------------
-  char actualWord[27];
   int bool_mot_incomplet = 1;
   int taille_mot;
   char word[27];
   char hangman[300] = {0};
-  char letters[27] = {0};
+  char* letters;
+  letters=malloc(27*sizeof(char));
+  int i;
+  for(i=0;i<27;i++){
+    letters[i]=' ';
+  }
   char pseudo[15];
   char msg[50]="Entrez votre pseudo : ";
   char alreadyWroteLetter = 0;
@@ -136,6 +146,7 @@ int main(int argc, char **argv) {
   pthread_t id_threadOthers, id_threadThisGamer;
   time_t startBlinkTime = time(NULL);
   time_t timeOfNow = time(NULL);
+  int ligne_init=0;
 
 
   //***************************Fonctions ***************************
@@ -150,57 +161,48 @@ int main(int argc, char **argv) {
   void demandePseudo(){
     clear();
     refresh();
-
-    mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
     int taille_pseudo;
     do{
-      refresh();
+      mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
       getstr(pseudo);
       taille_pseudo = strlen(pseudo);
       if(taille_pseudo < 1|| taille_pseudo>10){
         color_set(RED_B, NULL);
-        mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères");
+        mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères\nPseudo:");
+        mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
         color_set(WHITE_B, NULL);
+        
+
       }
     }while(taille_pseudo < 1|| taille_pseudo>10);
-    printf("ok\n");
-    mvprintw(2, 0, "Envoie de votre pseudo au serveur: %s", pseudo);
+    clear();
+    refresh();
+    strcpy(msg,"Initialisation des données, echange avec le serveur :");
+    color_set(CYAN_B, NULL);
+    mvprintw(ligne_init,(cols-strlen(msg))/2,"%s",msg);
+    ligne_init++;
+    ligne_init++;
+    color_set(WHITE_B, NULL);
+    mvprintw(ligne_init, 0, "Envoie de votre pseudo (%s) au serveur ...", pseudo);
+    ligne_init++;
     if ((write(socket_descriptor, pseudo, sizeof(pseudo))) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
 
     }
-
-    /*char pseudoRenv[50];
-    read(socket_descriptor, pseudoRenv, sizeof(pseudoRenv));
-    strcpy(pseudo, strchr(pseudoRenv,':')+1);
-    mvprintw(rows - 2, 0, ">%s", pseudo);
-
-    getch();*///supp car on read tout d'un coup
-    printf("ok\n");
   }
 
   void demandeJoueurs(char buffer2[]){
-    clear();
-    refresh();
-    strcpy(msg, "Reception des données des autres joueurs");
-    mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
+    mvprintw(ligne_init, 0, "Reception des données des autres joueurs...");
+    ligne_init++;
     char * joueur_i;
     char * joueur_points;
     char bufJoueurs[256];
-
-    //buffer2 = malloc(256*sizeof(char));
-   
-    /*if(read(socket_descriptor, buffer2, sizeof(buffer2))<1){
-    printf("error\n");};*/ //supp car on read tout d'un coup
-
-    //printf("-\n");
     //Message : others:pseudoA,pointsA;pseudoB,pointsB;.
-    mvprintw(2, 0,"users : %s\n", buffer2);
-    getch();
+    mvprintw(ligne_init, 0,"%s", buffer2);
+    ligne_init++;
     if(buffer2[0]!='o' || buffer2[6]!=':'){
       err("erreur : Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
     }
-    //printf("-\n");
     //COMPILER AVEC -g sinon erreur compil
     strcpy(bufJoueurs,strchr(buffer2, ':')/*+1*/); // pe +1
     if(strlen(buffer2)==strlen(bufJoueurs)){
@@ -231,47 +233,40 @@ int main(int argc, char **argv) {
     printf("nom : %s\n", tabJoueurs[j]->nom);
     printf("points : %s\n", tabJoueurs[j]->points);
     printf("-------\n");}*/
-
+    
 
   }
   void demandeLettres(char buff_lettres[]){
-    //lettresTrouvees:lettre1{pos1,pos2,0,0...,},lettre2{pos1,pos2,0,0...,},;lettresFausses:lettre1,lettre2,.
-
-
-    /*if(read(socket_descriptor, buff_lettres, sizeof(buff_lettres))<1){
-    printf("error\n");};*///supp car on lit tout d'un coup avant
+    mvprintw(ligne_init, 0, "Reception des infos de jeu...");
+    
+    ligne_init++;
     if(buff_lettres[0]!='l' || buff_lettres[15]!=':'){
       err("erreur lettres: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
     }
     strcpy(buff_lettres,strchr(buff_lettres, ':')+1);
     char* lettresTrouvees;
-    lettresTrouvees=malloc(50*sizeof(char));
-    lettresTrouvees= strtok(buff_lettres, ";");
+    lettresTrouvees=malloc(27*sizeof(char));
+    lettresTrouvees= strtok(buff_lettres, ".");
     char* lettresFausses;
-    lettresFausses=malloc(26*sizeof(char));
-    lettresFausses= strtok(NULL, ".");
-    printf("Trouvées %s\n",lettresTrouvees);
-    printf("Fausses %s\n",lettresFausses);
+    strcpy(word, lettresTrouvees);
+    lettresFausses=malloc(27*sizeof(char));
+    lettresFausses= strtok(NULL, "$");
+    mvprintw(ligne_init, 0, "Mot : %s", lettresTrouvees);
+    ligne_init++;
     
     strcpy(lettresFausses,strchr(lettresFausses, ':')+1);
     
-    printf("Trouvées %s\n",lettresTrouvees);
-    printf("Fausses %s\n",lettresFausses);
-/*
-    //LETTRES FAUSSES
-    char* lettre_fausse_i;
-    lettre_fausse_i = malloc(sizeof(char));
-    lettre_fausse_i = strtok(lettresFausses, ",");
-    while(strcmp(lettre_fausse_i, ".")!=0){
-      //on enleve les vies et on dessine le pendu
+    int ind_let_i=0;
+    char let_i = lettresFausses[ind_let_i];
+    while(let_i!='.'){
       lives--;
-      //dessin du pendu ici
-
-      addLetter(lettre_fausse_i[0], letters);
-      lettre_fausse_i = strtok(NULL, ",");
+      addLetter(let_i,letters);
+      ind_let_i++;
+      let_i = lettresFausses[ind_let_i];
     }
-    free(lettre_fausse_i);
-*/
+    mvprintw(ligne_init, 0, "Lettres erronees : %s", letters);
+    ligne_init++;
+    
   }
 
   void *threadOthers(){
@@ -309,47 +304,31 @@ int main(int argc, char **argv) {
    
     
     demandePseudo();
-    clear();
-    refresh();
    
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
-    mvprintw(10,0,"grandbuff: %s",grandBuf);
-    getch();
-    //lancement du thread d'ecoute du serveur
-    /*if( pthread_create( &(id_threadOthers) , NULL ,  threadOthers , NULL) < 0){
-		perror("could not create thread for other clients");
-		return 1;  
-	}*/
+    //pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
 	  char* copie;
     copie = malloc(500*sizeof(char));
 		strcpy(copie , grandBuf);
     char* bufTmp;
     bufTmp = malloc(200*sizeof(char));
     strcpy(bufTmp , strtok(grandBuf,"$"));
-    mvprintw(0,0,"Votre pseudo sera: %s",bufTmp);
-    mvprintw(1,0,"grandbuff: %s",grandBuf);
-    getch();
+    mvprintw(ligne_init,0,"Votre pseudo sera: %s",bufTmp);
+    ligne_init++;
+
     
     strcpy(bufTmp , strtok(NULL,"$"));
-    mvprintw(2,0,"bufftmp: %s",bufTmp);
-    getch();
+
     demandeJoueurs(bufTmp);
-    mvprintw(3,0,"les autres joueurs: %s",bufTmp);
-    getch();
-    clear();
-    refresh();
     strcpy(bufTmp , strtok(copie,"$"));
     strcpy(bufTmp , strtok(NULL,"$"));
     strcpy(bufTmp , strtok(NULL,"$"));
     
-    mvprintw(4,0,"les lettres: %s",bufTmp);
-    getch();
-    clear();
-    refresh();
     demandeLettres(bufTmp);
-
+    refresh();
+    sleep(1);
     
   }
 
@@ -357,49 +336,7 @@ int main(int argc, char **argv) {
 
 //a quoi ca sert d'en faire un thread ? -> mettre dans le prgm principal ?
   void *threadThisGamer(void * p_data){
-  	char scannedChar = 0;
-  	char oldScannedChar = 0;
-
-    while(bool_mot_incomplet && lives > 0){
-		scannedChar = toupper(getch());
-		if(scannedChar >= 'A' && scannedChar <= 'Z'){
-			if(checkLetter(scannedChar, letters) == -1){
-				//envoyer au serveur	
-				if(isWarningDone==1){
-					alreadyWroteIndex = checkLetter(scannedChar, letters);
-					alreadyWroteLetter = scannedChar;
-					wattrset(winLetters, A_REVERSE);
-					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-					wattroff(winLetters, A_REVERSE);
-					wrefresh(winLetters);
-					startBlinkTime = time(NULL);
-					isWarningDone = 0;
-				}else{
-					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-
-					alreadyWroteIndex = checkLetter(scannedChar, letters);
-					alreadyWroteLetter = scannedChar;
-					wattrset(winLetters, A_REVERSE);
-					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-					wattroff(winLetters, A_REVERSE);
-					wrefresh(winLetters);
-					startBlinkTime = time(NULL);
-				}	
-			}else{
-				//faire clignoter la lettre
-			}
-		}
-		
-		if(isWarningDone==0){
-			timeOfNow = time(NULL);
-			if(difftime(timeOfNow, startBlinkTime) >= 2){
-				wattroff(winLetters, A_REVERSE);
-				mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-				wrefresh(winLetters);
-				isWarningDone = 1;
-			}
-		}
-	}
+  	
 	
 
   }
@@ -453,51 +390,73 @@ int main(int argc, char **argv) {
   getch();
 
   initialisation();
-
-
+  
+  clear();
+  refresh();
+  winHangman = newwin(HANGMAN_HEIGHT + 4, HANGMAN_WIDTH + 4, 0, cols - 24);
+	winWord = newwin(1, strlen(word), rows/2, (cols-strlen(word))/2);
+	winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
+	winLetters = newwin(1, 26, 0, 0);
+	winOthers = newwin(16,nbJoueurs,3,1);
+	
   box(winHangman, ACS_VLINE, ACS_HLINE);
-
-  mvwprintw(winWord, 0, 0, "%s", actualWord);
+  box(winOthers, ACS_VLINE, ACS_HLINE);
+  mvwprintw(winWord, 0, 0, "%s", word);
   mvwprintw(winLives, 0, 0, "Lives : %d", lives);
-
   wrefresh(winHangman);
   wrefresh(winWord);
   wrefresh(winLives);
+  wrefresh(winOthers);
+  refresh();
+  sleep(5);
 
-  /*FAIRE 2 THREAD,
-  - 1 qui demande a ce client les lettres puis envoie au serveur la lettre
-  - l'autre qui s'occupe des reponses des autres clients et nouvelles (dé)connexions envoyé par le serveur
-  */
+    char scannedChar = 0;
+  	char oldScannedChar = 0;
+
+    while(bool_mot_incomplet && lives > 0){
+		scannedChar = toupper(getch());
+		if(scannedChar >= 'A' && scannedChar <= 'Z'){
+			if(checkLetter(scannedChar, letters) == -1){
+				//envoyer au serveur	
+				if(isWarningDone==1){
+					alreadyWroteIndex = checkLetter(scannedChar, letters);
+					alreadyWroteLetter = scannedChar;
+					wattrset(winLetters, A_REVERSE);
+					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+					wattroff(winLetters, A_REVERSE);
+					wrefresh(winLetters);
+					startBlinkTime = time(NULL);
+					isWarningDone = 0;
+				}else{
+					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+
+					alreadyWroteIndex = checkLetter(scannedChar, letters);
+					alreadyWroteLetter = scannedChar;
+					wattrset(winLetters, A_REVERSE);
+					mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+					wattroff(winLetters, A_REVERSE);
+					wrefresh(winLetters);
+					startBlinkTime = time(NULL);
+				}	
+			}else{
+				//faire clignoter la lettre
+			}
+		}
+		
+		if(isWarningDone==0){
+			timeOfNow = time(NULL);
+			if(difftime(timeOfNow, startBlinkTime) >= 2){
+				wattroff(winLetters, A_REVERSE);
+				mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+				wrefresh(winLetters);
+				isWarningDone = 1;
+			}
+		}
+	}
 
 
-  getch();
   endwin();
-
-
-
-
-  printf("envoi d'un message au serveur. \n");
-  while (strcmp(mesg, "quitter") !=0){
-    printf("\nmessage  a envoye   :\n");
-    scanf("%s", mesg);
-    /* envoi du message vers le serveur */
-    if ((write(socket_descriptor, mesg, sizeof(mesg))) < 0) {
-      perror("erreur : impossible d'ecrire le message destine au serveur.");
-      exit(1);
-    }
-
-    /* mise en attente du prgramme pour simuler un delai de transmission */
-    sleep(3);
-
-    printf("message envoye au serveur. \n");
-
-    /* lecture de la reponse en provenance du serveur */
-    if((longueur = read(socket_descriptor, buffer, sizeof(buffer))) > 0) {
-      printf(">");
-      write(1,buffer,longueur);
-    }
-
-  }
+  
 
   printf("\nfin de la reception. %d\n", socket_descriptor);
 

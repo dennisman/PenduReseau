@@ -11,6 +11,9 @@ Serveur à lancer avant le client
 #include <pthread.h> 
 #include <ctype.h>
 
+#include "../Pendu/dico.c"
+#include "Letters.c"
+
 #define TAILLE_MAX_NOM 256
 
 typedef struct sockaddr sockaddr;
@@ -123,10 +126,10 @@ void init_lettres(char* buffer){
     char buffer2[200]="lettresTrouvees:";
     
    //strcat(buffer2,lettres.motHache);
-   strcat(buffer2,"abc");
+   strcat(buffer2,"ABC"); //pour debugage client
    strcat(buffer2,".lettresFausses:");
    //strcat(buffer2,lettres.lettre_trouve_fausse);
-   strcat(buffer2,"def");
+   strcat(buffer2,"DEF");//pour debugage client
    strcat(buffer2,".");
    strcat(buffer, buffer2);
     
@@ -196,12 +199,61 @@ void renvoi (int sock) {
     return;
     
 }
+
+void initialisationMot(){
+
+	piocherMot(lettres.mot);
+	
+	printf(lettres.mot);
+	int i =0;
+	while( i < 27){
+		if(checkLetter2(lettres.mot[i]) != -1){
+			lettres.motHache[i] = '_';
+		}else{
+			lettres.motHache[i] = '\0';
+		}
+		i++;
+	}
+	printf(lettres.motHache);
+}
+
+void pendu(char lettrePropose){
+	unsigned int i;
+	int trouver = 0;
+
+	for(i = 0; i <= strlen(lettres.mot); i++)
+	{
+		if(lettres.mot[i] == lettrePropose)
+		{
+			lettres.motHache[i] = lettres.mot[i];
+			trouver = 1;
+		}
+	}
+	
+	if(trouver = 0){
+		for(i = 0; i < 26; i++) {
+			if(lettrePropose == lettres.lettre_trouve_fausse[i]){
+				trouver = 2;
+				//dire que la lettre a deja ete propose
+			}
+			if(trouver == 0 && lettres.lettre_trouve_fausse[i] == '\0'){
+				lettres.lettre_trouve_fausse[i] = lettrePropose;
+				i = 27;
+			}
+		}
+		
+	}
+
+	
+}
 /*------------------------------------------------------*/
 
 /*------------------------------------------------------*/
 main(int argc, char **argv) {
   
+  initialisationMot();
   
+	
 
     printf("\n     __________\n");
     printf("     | //      |\n");
