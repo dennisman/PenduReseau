@@ -91,6 +91,7 @@ int main(int argc, char **argv) {
   WINDOW *winLives;
   WINDOW *winLetters;
   WINDOW *winOthers;
+  WINDOW *winInfos;
   int rows = 0;
   int cols = 0;
   initscr();
@@ -300,8 +301,8 @@ int main(int argc, char **argv) {
   	char recu[200];
     while(bool_mot_incomplet && lives > 0){
     	if(read(socket_descriptor, recu, sizeof(recu))<1){
-      printf("error read sock\n");
-      }
+    		err("erreur de reception server"!);
+      	}
     	char typeMsg = recu[0];
     	if (strcmp(recu[1],":")!=0){
     		// erreur de reception
@@ -317,8 +318,14 @@ int main(int argc, char **argv) {
     	case 'd'://----------Déconnection client
     		//d:nomDuJoueur.
     	break;
-    	case 'r'://----------réponse d'un client (potentiellement nous)
-    		//r:LettreEnvoyée,nomDuJoueur,motHache.
+    	case 'v'://----------réponse d'un client (potentiellement nous) Bonne !
+    		//v:LettreEnvoyée,nomDuJoueur,motHache.
+    		char infos[30];
+    		//sprintf(infos,"%s envoie %s",,recu[0]);
+    	break;
+    	case 'f'://----------réponse d'un client (potentiellement nous) Fausse !
+    		//f:LettreEnvoyée,nomDuJoueur.
+    		char infos[]
     	break;
     	default://----------
     	break;
@@ -327,6 +334,7 @@ int main(int argc, char **argv) {
 
   	}
   }
+  
   void initialisation(){
     char grandBuf[500];
    
@@ -362,13 +370,6 @@ int main(int argc, char **argv) {
   }
 
   
-
-//a quoi ca sert d'en faire un thread ? -> mettre dans le prgm principal ?
-  void *threadThisGamer(void * p_data){
-  	
-	
-
-  }
 
 
   //***************************PRGM PRINCIPAL***************************
@@ -448,7 +449,7 @@ int main(int argc, char **argv) {
 
     char scannedChar = 0;
   	char oldScannedChar = 0;
-
+	char mess2serv[10];
     while(bool_mot_incomplet && lives > 0){
       nodelay(winHangman, 1);
 		  scannedChar = toupper(wgetch(winHangman));
@@ -456,7 +457,12 @@ int main(int argc, char **argv) {
 		  if(scannedChar >= 'A' && scannedChar <= 'Z'){
 			  if(checkLetter(scannedChar, letters) == -1){
 				  //envoyer au serveur
-					
+				  bzero(mess2serv,10);
+				  mess2serv[0]=scannedChar;
+				  if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
+      				err("erreur : impossible d'ecrire le message destine au serveur.");
+    			}
+    			//attendre une reponse pour repartir
 				
 			  }else{
 				  //faire clignoter la lettre
