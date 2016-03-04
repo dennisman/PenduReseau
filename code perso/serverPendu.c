@@ -48,7 +48,7 @@ typedef struct thread_socket {
     pthread_t id;
     int socket;
     char * pseudo;
-    int points;
+    unsigned int points;
 
 }thread_socket;
 	
@@ -140,24 +140,17 @@ void initialisation(thread_socket* tSock){
   tSock->points = 10;
   char buffer[500]="";
   char dollar[1] = "$";
-  printf("oui%s\n",buffer);
 	init_pseudo(tSock, buffer);
-	printf("oui%s\n",buffer);
 	strcat(buffer,"$");
-	printf("oui%s\n",buffer);
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses points
-	printf("oui%s\n",buffer);
 	init_others(buffer);
-	printf("oui%s\n",buffer);
 	strcat(buffer,"$");
-	printf("oui%s\n",buffer);
 	//init_mot(buffer);
 	//strcat(buffer,dollar);
 	init_lettres(buffer);
 	strcat(buffer,"$");
-	printf("oui%s\n",buffer);
 	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,sizeof(buffer));
   read(tSock->socket,buffer,sizeof(buffer));
@@ -165,7 +158,7 @@ void initialisation(thread_socket* tSock){
 	//dans le mot
 	
 	  
-}
+}/*
 void renvoi (int sock) {
 
     char buffer[256];
@@ -191,14 +184,14 @@ void renvoi (int sock) {
         printf("renvoi du message traite.\n");
 
         /* mise en attente du prgramme pour simuler un delai de transmission */
-        sleep(3);
+        /*sleep(3);
 
         write(sock,res,sizeof(res));
 
     }   
     return;
     
-}
+}*/
 
 void initialisationMot(){
 
@@ -214,7 +207,7 @@ void initialisationMot(){
 		}
 		i++;
 	}
-	printf(lettres.motHache);
+	//printf(lettres.motHache);
 }
 
 void pendu(char lettrePropose){
@@ -246,6 +239,27 @@ void pendu(char lettrePropose){
 
 	
 }
+
+//envoie a tout les clients des données
+void renvoi(){
+// message commence par c d v ou f
+}
+
+void jeu(thread_socket* tSock){
+    while(){
+     //ecoute client
+     if(){
+        //si lettre alors actualisation à tout les clients
+        renvoi();
+     }
+     if(){
+        //si deco alors sortir de la boucle
+     }
+    }
+        
+}
+
+
 /*------------------------------------------------------*/
 
 /*------------------------------------------------------*/
@@ -280,25 +294,25 @@ main(int argc, char **argv) {
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
     
     void *fct_thread(void * p_data){
-      int num_thread_sock = p_data;
-      num_thread_sock--;
-      //printf("fct_thread-----  : %s\n",);
-      
-      thread_socket *thread_sock= socket_tab[num_thread_sock];
-		  printf("reception d'un message sur sock %d\n",thread_sock->socket );
-		
-		  //------------1ere etape------------------
-		  //envoi des données pour que le client puisse initialiser le jeu
-		  initialisation(thread_sock);
-		  //------------2e etape------------------
-		  // echanges avec le client
-		  //play(*sock_des)
-		  //renvoi(*sock_des);
-		  sleep(50);
-		  close(thread_sock->socket );
-		  (void) p_data;
-      return NULL;
-		
+        int num_thread_sock = p_data;
+        num_thread_sock--;
+        //printf("fct_thread-----  : %s\n",);
+
+        thread_socket *thread_sock= socket_tab[num_thread_sock];
+        printf("reception d'un message sur sock %d\n",thread_sock->socket );
+
+        //------------1ere etape------------------
+        //envoi des données pour que le client puisse initialiser le jeu
+        initialisation(thread_sock);
+        //------------2e etape------------------
+        // echanges avec le client
+        jeu(thread_sock);
+        //renvoi(*sock_des);
+        sleep(50);
+        close(thread_sock->socket );
+        (void) p_data;
+        return NULL;
+
 	}
     /* recuperation de la structure d'adresse en utilisant le nom */
     if ((ptr_hote = gethostbyname(machine)) == NULL) {
