@@ -271,6 +271,34 @@ int main(int argc, char **argv) {
     ligne_init++;
     
   }
+  void suppJoueur(char * nomJ){
+    int trouve=0;
+    for(i=0; i<nbJoueurs;i++){
+      if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
+         trouve=1;
+      }
+      if(trouve==1 && i<nbJoueurs-1){
+        strcpy(tabJoueurs[i]->nom,tabJoueurs[i+1]->nom);
+        strcpy(tabJoueurs[i]->points,tabJoueurs[i+1]->points);
+      }
+   }
+   nbJoueurs--;     
+  }
+  void addPointWin(char * nomJ){
+    for(i=0; i<nbJoueurs;i++){
+      if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
+        //TODO
+      }
+    }
+    
+  }
+  void addPointLoose(char * nomJ){
+     for(i=0; i<nbJoueurs;i++){
+      if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
+        //TODO
+      }
+    }
+  }
   void aff_score(){
     werase(winOthers);
     wrefresh(winOthers);
@@ -299,9 +327,12 @@ int main(int argc, char **argv) {
   void *threadOthers(){
     
   	char recu[200];
+  	char lettre;
+  	char infos[30];
+  	char nomJ[20];
     while(bool_mot_incomplet && lives > 0){
     	if(read(socket_descriptor, recu, sizeof(recu))<1){
-    		err("erreur de reception server"!);
+    		err("erreur de reception server!");
       	}
     	char typeMsg = recu[0];
     	if (strcmp(recu[1],":")!=0){
@@ -310,28 +341,51 @@ int main(int argc, char **argv) {
     	}
     	strcpy(recu,strchr(recu, ":")+1);
     	switch (typeMsg){
-    	
     	case 'c'://----------connection nouveau client
     		//c:nomDuJoueur.
-    		
+    		strcpy(nomJ,strtok(recu,"."));
+    		sprintf(infos,"%s s'est connecté",nomJ);
+    		wcolor_set(winInfos,CYAN_B,NULL);
+    		strcpy(tabJoueurs[nbJoueurs]->nom,nomJ);
+    		strcpy(tabJoueurs[nbJoueurs]->points,"10");
+    		nbJoueurs++;
+    		aff_score();
     	break;
     	case 'd'://----------Déconnection client
     		//d:nomDuJoueur.
+    		strcpy(nomJ,strtok(recu,"."));
+    		sprintf(infos,"%s s'est déconnecté",nomJ);
+    		wcolor_set(winInfos,CYAN_B,NULL);
+    		suppJoueur(nomJ);
+    		aff_score();
     	break;
     	case 'v'://----------réponse d'un client (potentiellement nous) Bonne !
     		//v:LettreEnvoyée,nomDuJoueur,motHache.
-    		char infos[30];
-    		//sprintf(infos,"%s envoie %s",,recu[0]);
+    		
+    		lettre=recu[0];
+    		strtok(recu,",");
+    		strcpy(nomJ,strtok(NULL,","));
+    		strcpy(word,strtok(NULL,"."));
+    		mvwprintw(winWord, 0, 0, "%s", word);
+    		wrefresh(winWord);
+    		sprintf(infos,"%s propose %s",nomJ,lettre);
+    		wcolor_set(winInfos,GREEN_B,NULL);
+    		addPointWin(nomJ);
     	break;
     	case 'f'://----------réponse d'un client (potentiellement nous) Fausse !
     		//f:LettreEnvoyée,nomDuJoueur.
-    		char infos[]
+    		lettre=recu[0];
+    		strtok(recu,",");
+    		strcpy(nomJ,strtok(NULL,"."));
+    		sprintf(infos,"%s propose %s",nomJ,lettre);
+    		wcolor_set(winInfos,RED_B,NULL);
+    		addPointLoose(nomJ);
     	break;
     	default://----------
     	break;
     	}
-    	
-
+    	mvwprintw(winInfos,0,0,"%s",infos);
+      wcolor_set(winInfos,WHITE_B,NULL);
   	}
   }
   
