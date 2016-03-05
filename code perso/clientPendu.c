@@ -414,12 +414,12 @@ int main(int argc, char **argv) {
     		aff_score();
     	break;
     	case 'v'://----------réponse d'un client (potentiellement nous) Bonne !
-    		//v:LettreEnvoyée,nomDuJoueur,motHache.
+    		//v:LettreEnvoyée,motHache,nomDuJoueur.
     		
     		lettre=recu[0];
     		strtok(recu,",");
-    		strcpy(nomJ,strtok(NULL,","));
-    		strcpy(word,strtok(NULL,"."));
+    		strcpy(word,strtok(NULL,","));
+    		strcpy(nomJ,strtok(NULL,"."));
     		sprintf(infos,"%s propose %s",nomJ,lettre);
     		wcolor_set(winInfos,GREEN_B,NULL);
     		aff_word();
