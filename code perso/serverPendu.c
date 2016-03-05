@@ -21,34 +21,22 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct hostent hostent;
 typedef struct servent servent;
 
-typedef struct lettre_num {
-
-    char lettre;// = 0;
-    int position[27];// = {0};
-
-}lettre_num;
 
 typedef struct lettre_commun {
 
-    char mot[27];// = {0};
-    char lettre_trouve_fausse[26];// = {0};
-    char motHache[27]; //_héo
+    char mot[27];
+    char lettre_trouve_fausse[26];
+    char motHache[27]; 
 
 }lettre_commun;
 
-typedef struct param_thread {
-
-    lettre_commun l;
-    int numero_socket;
-
-}param_thread;
 
 typedef struct thread_socket {
 
     pthread_t id;
     int socket;
     char * pseudo;
-    unsigned int points;
+	unsigned int points;
 
 }thread_socket;
 	
@@ -153,45 +141,12 @@ void initialisation(thread_socket* tSock){
 	strcat(buffer,"$");
 	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,sizeof(buffer));
-  read(tSock->socket,buffer,sizeof(buffer));
+  //read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
 	
 	  
-}/*
-void renvoi (int sock) {
-
-    char buffer[256];
-    int longueur;
-    int i;
-    for(i=0; i<10;++i){
-		  
-		  
-        if ((longueur = read(sock, buffer, sizeof(buffer))) <= 0){
-            printf("rien du tout \n");
-            return;
-        }
-
-        printf("essai %d : %s \n", i+1, buffer);
-        char res[256] ;
-
-        strcpy(res, "vous avez envoyé: ");
-        strcat(res, buffer);
-        strcat(res, "\n\0");
-
-
-
-        printf("renvoi du message traite.\n");
-
-        /* mise en attente du prgramme pour simuler un delai de transmission */
-        /*sleep(3);
-
-        write(sock,res,sizeof(res));
-
-    }   
-    return;
-    
-}*/
+}
 
 void initialisationMot(){
 
@@ -210,9 +165,10 @@ void initialisationMot(){
 	//printf(lettres.motHache);
 }
 
-void pendu(char lettrePropose){
+char* pendu(char lettrePropose){
 	unsigned int i;
 	int trouver = 0;
+	char* res = "";
 
 	for(i = 0; i <= strlen(lettres.mot); i++)
 	{
@@ -227,34 +183,64 @@ void pendu(char lettrePropose){
 		for(i = 0; i < 26; i++) {
 			if(lettrePropose == lettres.lettre_trouve_fausse[i]){
 				trouver = 2;
-				//dire que la lettre a deja ete propose
+				strcat(res,"e");
 			}
 			if(trouver == 0 && lettres.lettre_trouve_fausse[i] == '\0'){
 				lettres.lettre_trouve_fausse[i] = lettrePropose;
 				i = 27;
+				strcat(res,"f:");
+				strcat(res,lettrePropose);
 			}
 		}
 		
+	} else {
+		strcat(res,"v:");
+		strcat(res,lettrePropose);
+		strcat(res,lettres.motHache);
 	}
+	
+	return res;
 
 	
 }
 
 //envoie a tout les clients des données
-void renvoi(){
-// message commence par c d v ou f
+void renvoi(char* message){
+	if(message[0] != 'e' ){
+		int i = 0;
+		for(i; i < socket_tab_size; i++){
+			
+			write(socket_tab[i]->socket,message,sizeof(message));
+		}
+	}
 }
 
 void jeu(thread_socket* tSock){
-    while(){
-     //ecoute client
-     if(){
-        //si lettre alors actualisation à tout les clients
-        renvoi();
+	char* buffer ;
+	char* envoi ;
+	char* pseudo = tSock->pseudo ;
+	//strcat(pseudo,tSock->pseudo);
+	int fin = 0;
+    while(fin == 0){
+		envoi = "";
+		sleep(1);
+     if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+		//if(buffer[1] != 'e'){
+			printf("%s \n",buffer);/*
+			strcat(envoi,pendu(buffer[0]));
+			strcat(envoi,pseudo);
+			
+			renvoi(envoi);
+		/*} else {
+			fin = 1;
+			strcat(envoi,"d:");
+			strcat(envoi,pseudo);
+			renvoi(envoi);
+		}*/
+        
      }
-     if(){
-        //si deco alors sortir de la boucle
-     }
+	 
+     
     }
         
 }
@@ -303,12 +289,17 @@ main(int argc, char **argv) {
 
         //------------1ere etape------------------
         //envoi des données pour que le client puisse initialiser le jeu
+		printf("initialisation debut\n");
         initialisation(thread_sock);
         //------------2e etape------------------
-        // echanges avec le client
+        // echanges avec le client.
+		printf("initialisation fini\n");
+		char tmp ='1';
+		//read(thread_sock->socket,tmp,sizeof(tmp));
+		//printf("%s \n",tmp);
+		write(thread_sock->socket,tmp,sizeof(tmp));
         jeu(thread_sock);
-        //renvoi(*sock_des);
-        sleep(50);
+        sleep(10);
         close(thread_sock->socket );
         (void) p_data;
         return NULL;
