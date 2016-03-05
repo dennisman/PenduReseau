@@ -151,6 +151,7 @@ int main(int argc, char **argv) {
   time_t timeOfNow = time(NULL);
   int ligne_init=0;
   curs_set(1);
+  int pasDeReponse=1;
 
   //***************************Fonctions ***************************
   void err(char * aff){
@@ -284,19 +285,66 @@ int main(int argc, char **argv) {
    }
    nbJoueurs--;     
   }
-  void addPointWin(char * nomJ){
+  void finDuJeu(){
+	  //TODO
+	}
+	void jeuPerdu(){
+	  
+	}
+  void addPointWin(char * nomJ, char lettre){
+    int i;
+    int j;
+    int motEntier=1;
+    int pts;
+    char* ptsStr;
     for(i=0; i<nbJoueurs;i++){
       if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
-        //TODO
+        j=i;
+         pts= atoi( tabJoueurs[i]->points );
+          for (i=0;i<strlen(word);i++){
+            if(word[i]=='_'){
+              motEntier=0;
+            }
+            if(word[i]==lettre){
+              pts++;
+            }
+          }
       }
+      break;
     }
+    if(motEntier==1){
+      pts = pts +10;
+    }
+    sprintf(tabJoueurs[j]->points,"%d",pts);
+    if(motEntier==1){
+      finDuJeu();
+    }
+    
     
   }
   void addPointLoose(char * nomJ){
+    int pts,i;
      for(i=0; i<nbJoueurs;i++){
       if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
-        //TODO
+        pts= atoi( tabJoueurs[i]->points );
+        pts--;
+        if(pts<0){
+          pts=0;
+        }
+        sprintf(tabJoueurs[i]->points,"%d",pts);
+        break;
       }
+    }
+    if (lives<1){
+      for(i=0; i<nbJoueurs;i++){
+         pts= atoi( tabJoueurs[i]->points );
+         pts -= 3;
+         if(pts<0){
+          pts=0;
+        }
+         sprintf(tabJoueurs[i]->points,"%d",pts);
+      }
+      jeuPerdu();
     }
   }
   void aff_score(){
@@ -324,13 +372,19 @@ int main(int argc, char **argv) {
 	  box(winHangman, ACS_VLINE, ACS_HLINE);
 	  wrefresh(winHangman);
 	}
+	void aff_word(){
+	  mvwprintw(winWord, 0, 0, "%s", word);
+    wrefresh(winWord);
+    //si le mot est rempli, fin du jeu appelé par la fonction addPointsWin
+ }
+	
   void *threadOthers(){
     
   	char recu[200];
   	char lettre;
   	char infos[30];
   	char nomJ[20];
-    while(bool_mot_incomplet && lives > 0){
+    while(/*bool_mot_incomplet==1 && lives > 0*/1){
     	if(read(socket_descriptor, recu, sizeof(recu))<1){
     		err("erreur de reception server!");
       	}
@@ -366,11 +420,13 @@ int main(int argc, char **argv) {
     		strtok(recu,",");
     		strcpy(nomJ,strtok(NULL,","));
     		strcpy(word,strtok(NULL,"."));
-    		mvwprintw(winWord, 0, 0, "%s", word);
-    		wrefresh(winWord);
     		sprintf(infos,"%s propose %s",nomJ,lettre);
     		wcolor_set(winInfos,GREEN_B,NULL);
-    		addPointWin(nomJ);
+    		aff_word();
+    		addPointWin(nomJ,lettre);
+    		if(strcmp(nomJ,pseudo) ==0){
+    		  pasDeReponse=0;
+    		}
     	break;
     	case 'f'://----------réponse d'un client (potentiellement nous) Fausse !
     		//f:LettreEnvoyée,nomDuJoueur.
@@ -379,12 +435,20 @@ int main(int argc, char **argv) {
     		strcpy(nomJ,strtok(NULL,"."));
     		sprintf(infos,"%s propose %s",nomJ,lettre);
     		wcolor_set(winInfos,RED_B,NULL);
+    		lives--;
+    		aff_hangman();
     		addPointLoose(nomJ);
+    		if(strcmp(nomJ,pseudo) ==0){
+    		  pasDeReponse=0;
+    		}
+    		
     	break;
     	default://----------
     	break;
     	}
     	mvwprintw(winInfos,0,0,"%s",infos);
+    	box(winInfos, ACS_VLINE, ACS_HLINE);
+    	wrefresh(winInfos);
       wcolor_set(winInfos,WHITE_B,NULL);
   	}
   }
@@ -485,9 +549,10 @@ int main(int argc, char **argv) {
 	winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
 	winLetters = newwin(1, 26, 0, 0);
 	winOthers = newwin(nbJoueurs+2,17,3,1);
+	winInfos = newwin(4,30,rows/2 + 5, (cols-30)/2);
 	
   box(winHangman, ACS_VLINE, ACS_HLINE);
-  
+  box(winInfos, ACS_VLINE, ACS_HLINE);
   mvwprintw(winWord, 0, 0, "%s", word);
   mvwprintw(winLives, 0, 0, "vies : %d", lives);
   mvwprintw(winLetters, 0, 0, "%s", letters);
@@ -503,8 +568,8 @@ int main(int argc, char **argv) {
 
     char scannedChar = 0;
   	char oldScannedChar = 0;
-	char mess2serv[10];
-    while(bool_mot_incomplet && lives > 0){
+	  char mess2serv[10];
+    while(/*bool_mot_incomplet==1 && lives > 0*/1){
       nodelay(winHangman, 1);
 		  scannedChar = toupper(wgetch(winHangman));
 		  nodelay(winHangman, 0);
@@ -517,6 +582,11 @@ int main(int argc, char **argv) {
       				err("erreur : impossible d'ecrire le message destine au serveur.");
     			}
     			//attendre une reponse pour repartir
+    			
+    			while(pasDeReponse==1){
+    			  sleep(1);
+    			}
+    			pasDeReponse=1;
 				
 			  }else{
 				  //faire clignoter la lettre
