@@ -462,7 +462,7 @@ int main(int argc, char **argv) {
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
-    pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
+    //pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
 	  char* copie;
     copie = malloc(500*sizeof(char));
 		strcpy(copie , grandBuf);
@@ -572,21 +572,25 @@ int main(int argc, char **argv) {
     while(/*bool_mot_incomplet==1 && lives > 0*/1){
       nodelay(winHangman, 1);
 		  scannedChar = toupper(wgetch(winHangman));
+		  
 		  nodelay(winHangman, 0);
 		  if(scannedChar >= 'A' && scannedChar <= 'Z'){
 			  if(checkLetter(scannedChar, letters) == -1){
 				  //envoyer au serveur
 				  bzero(mess2serv,10);
 				  mess2serv[0]=scannedChar;
+				  printf("envoie\n");
+				  
 				  if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
       				err("erreur : impossible d'ecrire le message destine au serveur.");
     			}
     			//attendre une reponse pour repartir
     			
-    			while(pasDeReponse==1){
+    			/*while(pasDeReponse==1){//TODO a garder, c'est juste pour debug server qu'on commente
+    			
     			  sleep(1);
     			}
-    			pasDeReponse=1;
+    			pasDeReponse=1;*/
 				
 			  }else{
 				  //faire clignoter la lettre

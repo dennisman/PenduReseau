@@ -21,34 +21,22 @@ typedef struct sockaddr_in sockaddr_in;
 typedef struct hostent hostent;
 typedef struct servent servent;
 
-typedef struct lettre_num {
-
-    char lettre;// = 0;
-    int position[27];// = {0};
-
-}lettre_num;
 
 typedef struct lettre_commun {
 
-    char mot[27];// = {0};
-    char lettre_trouve_fausse[26];// = {0};
-    char motHache[27]; //_héo
+    char mot[27];
+    char lettre_trouve_fausse[26];
+    char motHache[27]; 
 
 }lettre_commun;
 
-typedef struct param_thread {
-
-    lettre_commun l;
-    int numero_socket;
-
-}param_thread;
 
 typedef struct thread_socket {
 
     pthread_t id;
     int socket;
     char * pseudo;
-    int points;
+	unsigned int points;
 
 }thread_socket;
 	
@@ -140,64 +128,24 @@ void initialisation(thread_socket* tSock){
   tSock->points = 10;
   char buffer[500]="";
   char dollar[1] = "$";
-  printf("oui%s\n",buffer);
 	init_pseudo(tSock, buffer);
-	printf("oui%s\n",buffer);
 	strcat(buffer,"$");
-	printf("oui%s\n",buffer);
 	//ETAPE 2: envoie des données des autres utilisateurs
 	//pour chaque personne dans le tableau de socket, on envoie
 	//son pseudo et ses points
-	printf("oui%s\n",buffer);
 	init_others(buffer);
-	printf("oui%s\n",buffer);
 	strcat(buffer,"$");
-	printf("oui%s\n",buffer);
 	//init_mot(buffer);
 	//strcat(buffer,dollar);
 	init_lettres(buffer);
 	strcat(buffer,"$");
-	printf("oui%s\n",buffer);
 	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,sizeof(buffer));
-  read(tSock->socket,buffer,sizeof(buffer));
+  //read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
 	
 	  
-}
-void renvoi (int sock) {
-
-    char buffer[256];
-    int longueur;
-    int i;
-    for(i=0; i<10;++i){
-		  
-		  
-        if ((longueur = read(sock, buffer, sizeof(buffer))) <= 0){
-            printf("rien du tout \n");
-            return;
-        }
-
-        printf("essai %d : %s \n", i+1, buffer);
-        char res[256] ;
-
-        strcpy(res, "vous avez envoyé: ");
-        strcat(res, buffer);
-        strcat(res, "\n\0");
-
-
-
-        printf("renvoi du message traite.\n");
-
-        /* mise en attente du prgramme pour simuler un delai de transmission */
-        sleep(3);
-
-        write(sock,res,sizeof(res));
-
-    }   
-    return;
-    
 }
 
 void initialisationMot(){
@@ -214,12 +162,13 @@ void initialisationMot(){
 		}
 		i++;
 	}
-	printf(lettres.motHache);
+	//printf(lettres.motHache);
 }
 
-void pendu(char lettrePropose){
+char* pendu(char lettrePropose){
 	unsigned int i;
 	int trouver = 0;
+	char* res = "";
 
 	for(i = 0; i <= strlen(lettres.mot); i++)
 	{
@@ -234,18 +183,70 @@ void pendu(char lettrePropose){
 		for(i = 0; i < 26; i++) {
 			if(lettrePropose == lettres.lettre_trouve_fausse[i]){
 				trouver = 2;
-				//dire que la lettre a deja ete propose
+				strcat(res,"e");
 			}
 			if(trouver == 0 && lettres.lettre_trouve_fausse[i] == '\0'){
 				lettres.lettre_trouve_fausse[i] = lettrePropose;
 				i = 27;
+				strcat(res,"f:");
+				strcat(res,lettrePropose);
 			}
 		}
 		
+	} else {
+		strcat(res,"v:");
+		strcat(res,lettrePropose);
+		strcat(res,lettres.motHache);
 	}
+	
+	return res;
 
 	
 }
+
+//envoie a tout les clients des données
+void renvoi(char* message){
+	if(message[0] != 'e' ){
+		int i = 0;
+		for(i; i < socket_tab_size; i++){
+			
+			write(socket_tab[i]->socket,message,sizeof(message));
+		}
+	}
+}
+
+void jeu(thread_socket* tSock){
+	char buffer[50];
+	bzero(buffer,50);
+	char envoi[50] ;
+	char* pseudo = tSock->pseudo ;
+	//strcat(pseudo,tSock->pseudo);
+	int fin = 0;
+    while(fin == 0){
+		//envoi = "";
+		sleep(1);
+     if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+		//if(buffer[1] != 'e'){
+			printf("buff :%s \n",buffer);/*
+			strcat(envoi,pendu(buffer[0]));
+			strcat(envoi,pseudo);
+			
+			renvoi(envoi);
+		/*} else {
+			fin = 1;
+			strcat(envoi,"d:");
+			strcat(envoi,pseudo);
+			renvoi(envoi);
+		}*/
+        
+     }
+	 
+     
+    }
+        
+}
+
+
 /*------------------------------------------------------*/
 
 /*------------------------------------------------------*/
@@ -280,25 +281,32 @@ main(int argc, char **argv) {
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
     
     void *fct_thread(void * p_data){
-      int num_thread_sock = p_data;
-      num_thread_sock--;
-      //printf("fct_thread-----  : %s\n",);
-      
-      thread_socket *thread_sock= socket_tab[num_thread_sock];
-		  printf("reception d'un message sur sock %d\n",thread_sock->socket );
-		
-		  //------------1ere etape------------------
-		  //envoi des données pour que le client puisse initialiser le jeu
-		  initialisation(thread_sock);
-		  //------------2e etape------------------
-		  // echanges avec le client
-		  //play(*sock_des)
-		  //renvoi(*sock_des);
-		  sleep(50);
-		  close(thread_sock->socket );
-		  (void) p_data;
-      return NULL;
-		
+        int num_thread_sock = p_data;
+        num_thread_sock--;
+        //printf("fct_thread-----  : %s\n",);
+
+        thread_socket *thread_sock= socket_tab[num_thread_sock];
+        printf("reception d'un message sur sock %d\n",thread_sock->socket );
+        
+
+        //------------1ere etape------------------
+        //envoi des données pour que le client puisse initialiser le jeu
+		printf("initialisation debut\n");
+        initialisation(thread_sock);
+        //------------2e etape------------------
+        // echanges avec le client.
+        char tmp[256];
+		read(thread_sock->socket,tmp,sizeof(tmp));
+		printf("initialisation fini\n");
+		//petit read pour annuler le write d'on ne sait pas ou
+		//printf("%s \n",tmp);
+		//write(thread_sock->socket,tmp,sizeof(tmp));
+        jeu(thread_sock);
+        sleep(10);
+        close(thread_sock->socket );
+        (void) p_data;
+        return NULL;
+
 	}
     /* recuperation de la structure d'adresse en utilisant le nom */
     if ((ptr_hote = gethostbyname(machine)) == NULL) {

@@ -216,17 +216,18 @@ void renvoi(char* message){
 }
 
 void jeu(thread_socket* tSock){
-	char* buffer ;
-	char* envoi ;
+	char buffer[50];
+	bzero(buffer,50);
+	char envoi[50] ;
 	char* pseudo = tSock->pseudo ;
 	//strcat(pseudo,tSock->pseudo);
 	int fin = 0;
     while(fin == 0){
-		envoi = "";
+		//envoi = "";
 		sleep(1);
      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
 		//if(buffer[1] != 'e'){
-			printf("%s \n",buffer);/*
+			printf("buff :%s \n",buffer);/*
 			strcat(envoi,pendu(buffer[0]));
 			strcat(envoi,pseudo);
 			
@@ -286,6 +287,7 @@ main(int argc, char **argv) {
 
         thread_socket *thread_sock= socket_tab[num_thread_sock];
         printf("reception d'un message sur sock %d\n",thread_sock->socket );
+        
 
         //------------1ere etape------------------
         //envoi des données pour que le client puisse initialiser le jeu
@@ -293,11 +295,12 @@ main(int argc, char **argv) {
         initialisation(thread_sock);
         //------------2e etape------------------
         // echanges avec le client.
+        char tmp[256];
+		read(thread_sock->socket,tmp,sizeof(tmp));//petit read pour annuler le write d'on ne sait pas ou
 		printf("initialisation fini\n");
-		char tmp ='1';
-		//read(thread_sock->socket,tmp,sizeof(tmp));
+		
 		//printf("%s \n",tmp);
-		write(thread_sock->socket,tmp,sizeof(tmp));
+		//write(thread_sock->socket,tmp,sizeof(tmp));
         jeu(thread_sock);
         sleep(10);
         close(thread_sock->socket );
