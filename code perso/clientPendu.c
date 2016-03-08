@@ -385,8 +385,8 @@ int main(int argc, char **argv) {
   	char infos[30];
   	char nomJ[20];
     while(/*bool_mot_incomplet==1 && lives > 0*/1){
-    	if(read(socket_descriptor, recu, sizeof(recu))<1){
-    		err("erreur de reception server!");
+    	while(read(socket_descriptor, recu, sizeof(recu))<1){
+    		//err("erreur de reception server!");
       	}
     	char typeMsg = recu[0];
     	if (strcmp(recu[1],":")!=0){
@@ -462,7 +462,7 @@ int main(int argc, char **argv) {
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
-    //pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
+    pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
 	  char* copie;
     copie = malloc(500*sizeof(char));
 		strcpy(copie , grandBuf);
@@ -579,18 +579,18 @@ int main(int argc, char **argv) {
 				  //envoyer au serveur
 				  bzero(mess2serv,10);
 				  mess2serv[0]=scannedChar;
-				  printf("envoie\n");
+				  //printf("envoie\n");
 				  
 				  if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
       				err("erreur : impossible d'ecrire le message destine au serveur.");
     			}
     			//attendre une reponse pour repartir
     			
-    			/*while(pasDeReponse==1){//TODO a garder, c'est juste pour debug server qu'on commente
+    			while(pasDeReponse==1){//TODO a garder, c'est juste pour debug server qu'on commente
     			
     			  sleep(1);
     			}
-    			pasDeReponse=1;*/
+    			pasDeReponse=1;
 				
 			  }else{
 				  //faire clignoter la lettre

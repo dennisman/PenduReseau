@@ -174,10 +174,9 @@ void initialisationMot(){
 	//printf(lettres.motHache);
 }
 
-char* pendu(char lettrePropose){
+char* pendu(char lettrePropose, char res[]){
 	unsigned int i;
 	int trouver = 0;
-	char res[50];
 	for(i = 0; i < strlen(lettres.mot); i++)
 	{
 		if(lettres.mot[i] == lettrePropose)
@@ -241,6 +240,7 @@ void jeu(thread_socket* tSock){
 	bzero(buffer,50);
 	char envoi[50] ;
 	bzero(envoi,50);
+	strcpy(envoi,"");
 	char * pseudo = tSock->pseudo ;
 	int fin = 0;
     while(fin == 0){
@@ -249,7 +249,10 @@ void jeu(thread_socket* tSock){
      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
 		//if(buffer[1] != 'e'){
 			printf("buff:%s \n",buffer);
-			strcat(envoi,pendu(buffer[0]));
+			char tmp[50];
+			pendu(buffer[0],tmp);
+			printf("tmp:%s \n",tmp);
+			strcat(envoi,tmp);
 			strcat(envoi,pseudo);
 			printf("envoie:%s \n",envoi);
 			

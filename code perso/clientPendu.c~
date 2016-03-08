@@ -462,7 +462,7 @@ int main(int argc, char **argv) {
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
-    //pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
+    pthread_create( &id_threadOthers , NULL ,  threadOthers ,NULL);
 	  char* copie;
     copie = malloc(500*sizeof(char));
 		strcpy(copie , grandBuf);
@@ -579,7 +579,7 @@ int main(int argc, char **argv) {
 				  //envoyer au serveur
 				  bzero(mess2serv,10);
 				  mess2serv[0]=scannedChar;
-				  printf("envoie\n");
+				  //printf("envoie\n");
 				  
 				  if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
       				err("erreur : impossible d'ecrire le message destine au serveur.");
