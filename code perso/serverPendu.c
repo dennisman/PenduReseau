@@ -50,6 +50,14 @@ lettre_commun lettres;
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
+
+
+
+
+
+
+
+
 //ETAPE 1 de l'initialisation: pseudo
 void init_pseudo(thread_socket* tSock, char* buffer){
 
@@ -117,7 +125,7 @@ void init_lettres(char* buffer){
    //strcat(buffer2,"ABC"); //pour debugage client
    strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
-   strcat(buffer2,"DEF");//pour debugage client
+   //strcat(buffer2,"DEF");//pour debugage client
    strcat(buffer2,".");
    strcat(buffer, buffer2);
     
@@ -160,6 +168,7 @@ void initialisationMot(){
 		}else{
 			lettres.motHache[i] = '\0';
 		}
+		//lettres.lettre_trouve_fausse[i] = '%';
 		i++;
 	}
 	//printf(lettres.motHache);
@@ -168,9 +177,8 @@ void initialisationMot(){
 char* pendu(char lettrePropose){
 	unsigned int i;
 	int trouver = 0;
-	char* res = "";
-
-	for(i = 0; i <= strlen(lettres.mot); i++)
+	char res[50];
+	for(i = 0; i < strlen(lettres.mot); i++)
 	{
 		if(lettres.mot[i] == lettrePropose)
 		{
@@ -178,26 +186,39 @@ char* pendu(char lettrePropose){
 			trouver = 1;
 		}
 	}
-	
-	if(trouver = 0){
+	if(trouver == 0){
 		for(i = 0; i < 26; i++) {
+			
 			if(lettrePropose == lettres.lettre_trouve_fausse[i]){
 				trouver = 2;
-				strcat(res,"e");
+				res[0] = 'e';
+				res [1] = '\0';
 			}
+			
 			if(trouver == 0 && lettres.lettre_trouve_fausse[i] == '\0'){
+
 				lettres.lettre_trouve_fausse[i] = lettrePropose;
 				i = 27;
-				strcat(res,"f:");
-				strcat(res,lettrePropose);
+				res[0] = 'f';
+				res [1] = ':';
+				res [2] = lettrePropose;
+				res [3] = '\0';
+				
 			}
+			
 		}
 		
 	} else {
-		strcat(res,"v:");
-		strcat(res,lettrePropose);
+		res[0] = 'v';
+		res [1] = ':';
+		res [2] = lettrePropose;
+		res [3] = ',';
+		res [4] = '\0';
 		strcat(res,lettres.motHache);
 	}
+	
+	
+	strcat(res,",\0");
 	
 	return res;
 
@@ -219,17 +240,18 @@ void jeu(thread_socket* tSock){
 	char buffer[50];
 	bzero(buffer,50);
 	char envoi[50] ;
-	char* pseudo = tSock->pseudo ;
-	//strcat(pseudo,tSock->pseudo);
+	bzero(envoi,50);
+	char * pseudo = tSock->pseudo ;
 	int fin = 0;
     while(fin == 0){
-		//envoi = "";
 		sleep(1);
+	bzero(envoi,50);
      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
 		//if(buffer[1] != 'e'){
-			printf("buff :%s \n",buffer);/*
+			printf("buff:%s \n",buffer);
 			strcat(envoi,pendu(buffer[0]));
 			strcat(envoi,pseudo);
+			printf("envoie:%s \n",envoi);
 			
 			renvoi(envoi);
 		/*} else {
