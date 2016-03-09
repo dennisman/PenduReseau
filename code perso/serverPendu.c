@@ -149,6 +149,19 @@ void initialisation(thread_socket* tSock){
 	strcat(buffer,"$");
 	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,strlen(buffer));
+	
+	char message[20] = "c:";
+	strcat(message,tSock->pseudo;);
+	
+	int i = 0;
+    for(i; i < socket_tab_size; i++){
+        
+        if(socket_tab[i]->socket != tSock->socket)
+	    write(socket_tab[i]->socket,message,strlen(message));
+		
+	}
+	
+	
   //read(tSock->socket,buffer,sizeof(buffer));
 	//Etape 3: envoie des lettres fausses et lettre trouvées + indices
 	//dans le mot
