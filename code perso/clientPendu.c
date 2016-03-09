@@ -377,6 +377,7 @@ int main(int argc, char **argv) {
 
   void aff_scores(){
     werase(winOthers);
+    wresize(winOthers,nbJoueurs+2,17);
     wrefresh(winOthers);
     int i;
     char nomJ[15];
@@ -455,12 +456,14 @@ int main(int argc, char **argv) {
 
 
   void aff_hangman(){
+    werase(winHangman);
     readHangman(hangman, ((lives-10)*-1));
     printHangman(winHangman, 1, 2, hangman);
     box(winHangman, ACS_VLINE, ACS_HLINE);
     wrefresh(winHangman);
   }
   void aff_word(){
+    werase(winWord);
     mvwprintw(winWord, 0, 0, "%s", word);
     wrefresh(winWord);
     //si le mot est rempli, fin du jeu appelé par la fonction addPointsWin
@@ -490,6 +493,12 @@ int main(int argc, char **argv) {
         strcpy(nomJ,strtok(recu,"."));
         sprintf(infos,"%s s'est connecté",nomJ);
         wcolor_set(winInfos,CYAN_B,NULL);
+        werase(winInfos);
+        box(winInfos, ACS_VLINE, ACS_HLINE);
+        mvwprintw(winInfos,1,2,"%s",infos);
+        wrefresh(winInfos);
+        wcolor_set(winInfos,WHITE_B,NULL);
+        tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
         strcpy(tabJoueurs[nbJoueurs]->nom,nomJ);
         strcpy(tabJoueurs[nbJoueurs]->points,"10");
         nbJoueurs++;
@@ -513,6 +522,7 @@ int main(int argc, char **argv) {
         strcpy(nomJ,strtok(NULL,"."));
         sprintf(infos,"%s propose %c",nomJ,lettre);
         wcolor_set(winInfos,GREEN_B,NULL);
+        werase(winInfos);
         box(winInfos, ACS_VLINE, ACS_HLINE);
         mvwprintw(winInfos,1,2,"%s",infos);
         wrefresh(winInfos);
@@ -533,6 +543,7 @@ int main(int argc, char **argv) {
         strcpy(nomJ,strtok(NULL,"."));
         sprintf(infos,"%s propose %c",nomJ,lettre);
         wcolor_set(winInfos,RED_B,NULL);
+        werase(winInfos);
         box(winInfos, ACS_VLINE, ACS_HLINE);
         mvwprintw(winInfos,1,2,"%s",infos);
         wrefresh(winInfos);
@@ -550,9 +561,10 @@ int main(int argc, char **argv) {
       }
 
 
-
+      werase(winLives);
       mvwprintw(winLives, 0, 0, "vies : %d", lives);
       wrefresh(winLives);
+      werase(winLetters);
       mvwprintw(winLetters, 0, 0, "%s", letters);
       wrefresh(winLetters);
       bzero(recu,200);
@@ -673,14 +685,15 @@ int main(int argc, char **argv) {
   refresh();
 
   char scannedChar = 0;
+  int scannedInt=0;
   char oldScannedChar = 0;
   char mess2serv[10];
   while(/*bool_mot_incomplet==1 && lives > 0*/1){
     if(finished==0){
-      nodelay(winHangman, 1);
-      scannedChar = toupper(wgetch(winHangman));
-
-      nodelay(winHangman, 0);
+      //nodelay(winHangman, 1);
+      scannedInt=wgetch(winHangman);
+      scannedChar = toupper(scannedInt);
+      //nodelay(winHangman, 0);
       if(scannedChar >= 'A' && scannedChar <= 'Z'){
         if(checkLetter(scannedChar, letters) == -1){
           //envoyer au serveur
@@ -722,6 +735,18 @@ int main(int argc, char **argv) {
             wrefresh(winLetters);
             startBlinkTime = time(NULL);
           }
+        }
+      }else{
+        //si on appuie sur echap
+        if(scannedInt==27){
+          bzero(mess2serv,10);
+          mess2serv[0]=scannedChar;
+          //printf("envoie\n");
+
+          if ((write(socket_descriptor, mess2serv, 1)) < 0) {
+            err("erreur : impossible d'ecrire le message destine au serveur.");
+          }
+          closeExit();
         }
       }
 
