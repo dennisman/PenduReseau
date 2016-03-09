@@ -226,13 +226,13 @@ char* pendu(char lettrePropose, char res[]){
 
 //envoie a tout les clients des données
 void renvoi(char message[]){
-	if(message[0] != 'e' ){
+
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
 
 			write(socket_tab[i]->socket,message,strlen(message)
     );
-		}
+		
 	}
 }
 
@@ -245,6 +245,8 @@ void jeu(thread_socket* tSock){
 	char * pseudo = tSock->pseudo ;
 	int fin = 0;
     while(fin == 0){
+      bzero(envoi,50);
+      bzero(buffer,50);
 		sleep(1);
      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
 		//if(buffer[1] != 'e'){

@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
   void closeExit(){
     close(socket_descriptor);
     curs_set(1);
+    clear();
     delwin(winWord);
     delwin(winHangman);
     delwin(winLives);
@@ -308,7 +309,7 @@ int main(int argc, char **argv) {
     if(scannedChar == 'Y'){
       //*4
       char envoi[300];
-      strcpy(envoi, "Rejoue:");
+      strcpy(envoi, "$");
       envoi[7]=scannedChar;
       write(socket_descriptor, envoi, strlen(envoi));
 
@@ -350,10 +351,11 @@ int main(int argc, char **argv) {
   	//*1
   	finished=1;
 
+
     //*2*3
     char infos[50];
     strcpy(infos, "Le groupe n'a plus de vies, voulez vous rejouer? Y/N");
-    mvwprintw(winInfos,0,0,"%s",infos);
+    mvwprintw(winInfos,1,2,"%s",infos);
     box(winInfos, ACS_VLINE, ACS_HLINE);
     wrefresh(winInfos);
   	finDuJeu();
@@ -363,10 +365,11 @@ int main(int argc, char **argv) {
   	//*1
     finished=1;
 
+
     //*2*3
     char infos[50];
     strcpy(infos, "Le mot a été trouvé, voulez vous rejouer? Y/N");
-    mvwprintw(winInfos,0,0,"%s",infos);
+    mvwprintw(winInfos,1,2,"%s",infos);
     box(winInfos, ACS_VLINE, ACS_HLINE);
     wrefresh(winInfos);
     finDuJeu();
@@ -474,13 +477,13 @@ int main(int argc, char **argv) {
 
       while(read(socket_descriptor, recu, sizeof(recu))<1){
       }
-      printf("mess recu :%s---\n",recu);
+      //printf("mess recu :%s---\n",recu);
       char typeMsg = recu[0];
       if (recu[1]!=':'){
         printf("erreur de reception\n");
         break;
       }
-      //strcpy(recu,strchr(recu, ':')+1);
+      strcpy(recu,strchr(recu, ':')+1);
       switch (typeMsg){
         case 'c'://----------connection nouveau client
         //c:nomDuJoueur.
@@ -505,10 +508,16 @@ int main(int argc, char **argv) {
 
         lettre=recu[0];
         strtok(recu,",");
+
         strcpy(word,strtok(NULL,","));
         strcpy(nomJ,strtok(NULL,"."));
         sprintf(infos,"%s propose %c",nomJ,lettre);
         wcolor_set(winInfos,GREEN_B,NULL);
+        box(winInfos, ACS_VLINE, ACS_HLINE);
+        mvwprintw(winInfos,1,2,"%s",infos);
+        wrefresh(winInfos);
+        wcolor_set(winInfos,WHITE_B,NULL);
+
         aff_word();
         addPointWin(nomJ,lettre);
         if(strcmp(nomJ,pseudo) ==0){
@@ -519,21 +528,18 @@ int main(int argc, char **argv) {
         //f:LettreEnvoyée,nomDuJoueur.
 
         lettre=recu[0];
-        printf("%d\n",i);i++;
-        printf("lettre :%c\n",lettre);
+        addLetter(lettre,letters);
         strtok(recu,",");
         strcpy(nomJ,strtok(NULL,"."));
-        printf("%d\n",i);i++;
-        printf("nomJ :%s\n",nomJ);
         sprintf(infos,"%s propose %c",nomJ,lettre);
-        printf("%d\n",i);i++;
         wcolor_set(winInfos,RED_B,NULL);
-        printf("%d\n",i);i++;
+        box(winInfos, ACS_VLINE, ACS_HLINE);
+        mvwprintw(winInfos,1,2,"%s",infos);
+        wrefresh(winInfos);
+        wcolor_set(winInfos,WHITE_B,NULL);
         lives--;
         aff_hangman();
-        printf("%d\n",i);i++;
         addPointLoose(nomJ);
-        printf("%d\n",i);i++;
         if(strcmp(nomJ,pseudo) ==0){
           pasDeReponse=0;
         }
@@ -542,11 +548,14 @@ int main(int argc, char **argv) {
         default://----------
         break;
       }
-      /*mvwprintw(winInfos,0,0,"%s",infos);
-      box(winInfos, ACS_VLINE, ACS_HLINE);
-      wrefresh(winInfos);
-      wcolor_set(winInfos,WHITE_B,NULL);
-      bzero(recu,200);*/
+
+
+
+      mvwprintw(winLives, 0, 0, "vies : %d", lives);
+      wrefresh(winLives);
+      mvwprintw(winLetters, 0, 0, "%s", letters);
+      wrefresh(winLetters);
+      bzero(recu,200);
     }
   }
 
@@ -646,7 +655,7 @@ int main(int argc, char **argv) {
   winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
   winLetters = newwin(1, 26, 0, 0);
   winOthers = newwin(nbJoueurs+2,17,3,1);
-  winInfos = newwin(4,50,rows/2 + 5, (cols-50)/2);
+  winInfos = newwin(4,55,rows/2 + 5, (cols-55)/2);
 
   box(winHangman, ACS_VLINE, ACS_HLINE);
   box(winInfos, ACS_VLINE, ACS_HLINE);
