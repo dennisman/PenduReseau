@@ -254,6 +254,7 @@ void jeu(thread_socket* tSock){
 			printf("tmp:%s \n",tmp);
 			strcat(envoi,tmp);
 			strcat(envoi,pseudo);
+			strcat(envoi,".");
 			printf("envoie:%s \n",envoi);
 			
 			renvoi(envoi);

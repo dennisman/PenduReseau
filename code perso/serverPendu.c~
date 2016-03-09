@@ -174,7 +174,7 @@ void initialisationMot(){
 	//printf(lettres.motHache);
 }
 
-char* pendu(char lettrePropose char res[]){
+char* pendu(char lettrePropose, char res[]){
 	unsigned int i;
 	int trouver = 0;
 	for(i = 0; i < strlen(lettres.mot); i++)

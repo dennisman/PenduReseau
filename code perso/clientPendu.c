@@ -324,6 +324,7 @@ int main(int argc, char **argv) {
       strcpy(word , strtok(envoi,"$"));
       //surement des erreurs par la, tests a faire
       strcpy(envoi , strtok(NULL,"$"));
+      nbJoueurs =0;
       demandeJoueurs(envoi);
       //*7
       finished = 0
@@ -466,18 +467,20 @@ int main(int argc, char **argv) {
     
     char recu[200];
     char lettre;
-    char infos[30];
+    char infos[50];
     char nomJ[20];
+    int i=0;
     while(/*bool_mot_incomplet==1 && lives > 0*/1){
       while(read(socket_descriptor, recu, sizeof(recu))<1){
         //err("erreur de reception server!");
       }
+      printf("mess recu :%s\n",recu);
       char typeMsg = recu[0];
-      if (strcmp(recu[1],":")!=0){
-        // erreur de reception
+      if (recu[1]!=':'){
+        printf("erreur de reception\n");
         break;
       }
-      strcpy(recu,strchr(recu, ":")+1);
+      strcpy(recu,strchr(recu, ':')+1);
       switch (typeMsg){
         case 'c'://----------connection nouveau client
         //c:nomDuJoueur.
@@ -504,7 +507,7 @@ int main(int argc, char **argv) {
         strtok(recu,",");
         strcpy(word,strtok(NULL,","));
         strcpy(nomJ,strtok(NULL,"."));
-        sprintf(infos,"%s propose %s",nomJ,lettre);
+        sprintf(infos,"%s propose %c",nomJ,lettre);
         wcolor_set(winInfos,GREEN_B,NULL);
         aff_word();
         addPointWin(nomJ,lettre);
@@ -514,14 +517,23 @@ int main(int argc, char **argv) {
         break;
         case 'f'://----------réponse d'un client (potentiellement nous) Fausse !
         //f:LettreEnvoyée,nomDuJoueur.
+        
         lettre=recu[0];
+        printf("%d\n",i);i++;
+        printf("lettre :%c\n",lettre);
         strtok(recu,",");
         strcpy(nomJ,strtok(NULL,"."));
-        sprintf(infos,"%s propose %s",nomJ,lettre);
+        printf("%d\n",i);i++;
+        printf("nomJ :%s\n",nomJ);
+        /*sprintf(infos,"%s propose %c",nomJ,lettre);
+        printf("%d\n",i);i++;
         wcolor_set(winInfos,RED_B,NULL);
+        printf("%d\n",i);i++;
         lives--;
         aff_hangman();
+        printf("%d\n",i);i++;
         addPointLoose(nomJ);
+        printf("%d\n",i);i++;*/
         if(strcmp(nomJ,pseudo) ==0){
           pasDeReponse=0;
         }
@@ -530,10 +542,11 @@ int main(int argc, char **argv) {
         default://----------
         break;
       }
-      mvwprintw(winInfos,0,0,"%s",infos);
+      /*mvwprintw(winInfos,0,0,"%s",infos);
       box(winInfos, ACS_VLINE, ACS_HLINE);
       wrefresh(winInfos);
       wcolor_set(winInfos,WHITE_B,NULL);
+      bzero(recu,200);*/
     }
   }
   
@@ -616,9 +629,9 @@ int main(int argc, char **argv) {
   
   
   color_set(GREEN_B, NULL);
-  mvprintw(rows/2,cols/2,"Connexion effectué avec succès.");
+  mvprintw(rows/2,cols/2,"Connexion effectuée avec succès.");
   color_set(WHITE_B, NULL);
-  mvprintw(rows - 2, cols - (33), "Pressez une touche pour continuer.");
+  mvprintw(rows - 2, cols - (33), "Pressez une touche pour continuer");
   getch();
   
   initialisation();
