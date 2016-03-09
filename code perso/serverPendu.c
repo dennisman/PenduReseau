@@ -262,13 +262,16 @@ char jeuFini(){
     char res = 'f';
     if(lettres.lettre_trouve_fausse[9] >= 'A' && lettres.lettre_trouve_fausse[9] <= 'Z'){
         res = 't';
+        return res;
     }
+    res = 't';
     int i;
     for(i = 0; i < strlen(lettres.mot); i++)
 	{
 		if(lettres.mot[i] != lettres.motHache[i])
 		{
-			res = 't';
+			res = 'f';
+			return res;
 		}
 	}
     return res;
