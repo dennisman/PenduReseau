@@ -383,6 +383,17 @@ main(int argc, char **argv) {
             
         }
         sleep(5);
+        
+        int i;
+        for(i=0; i<socket_tab_size;i++){
+          if(strcmp(thread_sock->pseudo, socket_tab[i]->pseudo)==0){
+            socket_tab[i]=socket_tab[socket_tab_size-1];
+            socket_tab_size--;
+            break;
+          }
+          
+        }
+        
         close(thread_sock->socket );
         (void) p_data;
         return NULL;
