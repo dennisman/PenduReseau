@@ -260,7 +260,7 @@ char finJeu(thread_socket* tSock){
 //fonction qui renvoie t si le jeu est fini sinon f
 char jeuFini(){
     char res = 'f';
-    if(lettres.lettre_trouve_fausse[9]!= '\0'){
+    if(lettres.lettre_trouve_fausse[9] >= 'A' && lettres.lettre_trouve_fausse[9] <= 'Z'){
         res = 't';
     }
     int i;
@@ -268,7 +268,7 @@ char jeuFini(){
 	{
 		if(lettres.mot[i] != lettres.motHache[i])
 		{
-			res = 'f';
+			res = 't';
 		}
 	}
     return res;
@@ -377,7 +377,7 @@ main(int argc, char **argv) {
 
 		//printf("%s \n",tmp);
 		//write(thread_sock->socket,tmp,sizeof(tmp));
-        while(jeu(thread_sock) == 'Y');{
+        while(jeu(thread_sock) == 'Y'){
             initialisationMot();
             
             
