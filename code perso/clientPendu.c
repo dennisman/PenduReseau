@@ -10,7 +10,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <signal.h>
-#include <pthread.h> 
+#include <pthread.h>
 #include <string.h>
 #include <errno.h>
 #include "Letters.c"
@@ -40,18 +40,18 @@ int str_to_int(const char *s, int *p)
   {
     char *end;
     *p = (int)strtol(s, &end, 10);
-    
+
     if (errno != 0)
     ret = 2; /* code d'erreur 2 : la fonction strtol a rencontre une erreur. */
     else if (*end != '\0')
     ret = 3; /* code d'erreur 3 : la conversion a échoué car un caractère invalide a été détecté. */
   }
-  
+
   return ret;
 }
 
 int main(int argc, char **argv) {
-  
+
   int 	socket_descriptor, 	/* descripteur de socket */
   longueur; 		/* longueur d'un buffer utilisé */
   sockaddr_in adresse_locale; 	/* adresse de socket local */
@@ -61,16 +61,16 @@ int main(int argc, char **argv) {
   char *	prog; 			/* nom du programme */
   char *	host; 			/* nom de la machine distante */
   char	mesg[256]; 			/* message envoyé */
-  
-  
+
+
   if (argc != 2) {
     perror("usage : client <adresse-serveur>");
     exit(1);
   }
-  
+
   prog = argv[0];
   host = argv[1];
-  
+
   //--------------------DEFINITION DES FENETRES-----------------------
   WINDOW *winHangman;
   WINDOW *winWord;
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
   initscr();
   start_color();
   getmaxyx(stdscr, rows, cols);
-  
+
   //----------------Verification taille min-----------------
   if (rows < 16 || cols < 55)
   {
@@ -92,14 +92,14 @@ int main(int argc, char **argv) {
     "I recommand a size of 80x24.\n");
     exit(EXIT_FAILURE);
   }
-  
+
   //----------------Verification couleur-----------------
   if(has_colors() == FALSE)
   {	endwin();
     printf("Your terminal does not support color\n");
     exit(1);
   }
-  
+
   //--------------------DEFINITION DES COULEURS-----------------------
   #define WHITE_B 1
   init_pair(WHITE_B, COLOR_WHITE, COLOR_BLACK);
@@ -110,9 +110,9 @@ int main(int argc, char **argv) {
   #define CYAN_B 4
   init_pair(CYAN_B, COLOR_CYAN, COLOR_BLACK);
   //color_set(RED_B, NULL);
-  
-  
-  
+
+
+
   //--------------------DEFINITION DES VARIABLES DE JEU-----------------------
   int bool_mot_incomplet = 1;
   int taille_mot;
@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
   curs_set(1);
   int pasDeReponse=1;
   int finished = 0;
-  
+
   //***************************Fonctions ***************************
   void closeExit(){
     close(socket_descriptor);
@@ -157,9 +157,9 @@ int main(int argc, char **argv) {
   {
     if (signo == SIGINT)
     closeExit();
-    
+
   }
-  
+
   if (signal(SIGINT, sig_handler) == SIG_ERR){
     printf("\ncan't catch SIGINT\n");
   }
@@ -184,8 +184,8 @@ int main(int argc, char **argv) {
         mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères");
         mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
         color_set(WHITE_B, NULL);
-        
-        
+
+
       }
     }while(taille_pseudo < 1|| taille_pseudo>10);
     clear();
@@ -198,12 +198,12 @@ int main(int argc, char **argv) {
     color_set(WHITE_B, NULL);
     mvprintw(ligne_init, 0, "Envoie de votre pseudo (%s) au serveur ...", pseudo);
     ligne_init++;
-    if ((write(socket_descriptor, pseudo, sizeof(pseudo))) < 0) {
+    if ((write(socket_descriptor, pseudo, strlen(pseudo))) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
-      
+
     }
   }
-  
+
   void demandeJoueurs(char buffer2[]){
     mvprintw(ligne_init, 0, "Reception des données des autres joueurs...");
     ligne_init++;
@@ -220,9 +220,9 @@ int main(int argc, char **argv) {
     strcpy(bufJoueurs,strchr(buffer2, ':')+1); // pe +1
     if(strlen(buffer2)==strlen(bufJoueurs)){
       err("erreur : mauvaise reception des autres joueurs");
-      
+
     }
-    
+
     joueur_i = strtok(bufJoueurs, ";");
     do{
       tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
@@ -230,8 +230,8 @@ int main(int argc, char **argv) {
       nbJoueurs++;
       joueur_i = strtok(NULL, ";");
     }while (strcmp(joueur_i ,".")!=0 &&joueur_i != NULL);
-    
-    
+
+
     int j;
     for(j=0; j<nbJoueurs;j++){
       joueur_i = strtok(tabJoueurs[j]->nom, ",");
@@ -239,19 +239,19 @@ int main(int argc, char **argv) {
       joueur_i = strtok(NULL, ",");
       strcpy(tabJoueurs[j]->points,joueur_i);
     }
-    
+
     //Ca marche
     /*
     for(j=0; j<nbJoueurs;j++){
     printf("nom : %s\n", tabJoueurs[j]->nom);
     printf("points : %s\n", tabJoueurs[j]->points);
     printf("-------\n");}*/
-    
-    
+
+
   }
   void demandeLettres(char buff_lettres[]){
     mvprintw(ligne_init, 0, "Reception des infos de jeu...");
-    
+
     ligne_init++;
     if(buff_lettres[0]!='l' || buff_lettres[15]!=':'){
       err("erreur lettres: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
@@ -266,9 +266,9 @@ int main(int argc, char **argv) {
     lettresFausses= strtok(NULL, "$");
     mvprintw(ligne_init, 0, "Mot : %s", lettresTrouvees);
     ligne_init++;
-    
+
     strcpy(lettresFausses,strchr(lettresFausses, ':')+1);
-    
+
     int ind_let_i=0;
     char let_i = lettresFausses[ind_let_i];
     while(let_i!='.'){
@@ -279,7 +279,7 @@ int main(int argc, char **argv) {
     }
     mvprintw(ligne_init, 0, "Lettres erronees : %s", letters);
     ligne_init++;
-    
+
   }
   void suppJoueur(char * nomJ){
     int trouve=0;
@@ -292,10 +292,10 @@ int main(int argc, char **argv) {
         strcpy(tabJoueurs[i]->points,tabJoueurs[i+1]->points);
       }
     }
-    nbJoueurs--;     
+    nbJoueurs--;
   }
-  
-  
+
+
   void finDuJeu(){
     //*3
     char scannedChar;
@@ -304,14 +304,14 @@ int main(int argc, char **argv) {
       scannedChar = toupper(wgetch(winHangman));
       nodelay(winHangman, 0);
     }while(scannedChar != 'Y' && scannedChar != 'N');
-    
+
     if(scannedChar == 'Y'){
       //*4
       char envoi[300];
       strcpy(envoi, "Rejoue:");
       envoi[7]=scannedChar;
-      write(socket_descriptor, envoi, sizeof(envoi));
-      
+      write(socket_descriptor, envoi, strlen(envoi));
+
       //*5
       bzero(envoi,300);
       /*le serveur a attendu que tout les clients repondent
@@ -319,7 +319,7 @@ int main(int argc, char **argv) {
       donnees:motHache$others:j1,pts;j2,pts;.
       */
       read(socket_descriptor, envoi, sizeof(envoi));
-      
+
       //*6
       strcpy(word , strtok(envoi,"$"));
       //surement des erreurs par la, tests a faire
@@ -328,10 +328,10 @@ int main(int argc, char **argv) {
       demandeJoueurs(envoi);
       //*7
       finished = 0
-      
-      
+
+
       /*
-      1*arreter la boucle qui demande les touches au joueur 
+      1*arreter la boucle qui demande les touches au joueur
       (if avec un var globale)
       2*affichage des scores/signalement fin
       3*on demande aux utilisateurs si il veulent rejouer
@@ -344,25 +344,25 @@ int main(int argc, char **argv) {
     }else{
       closeExit();
     }
-    
+
   }
   void jeuPerdu(){
   	//*1
   	finished=1;
-    
+
     //*2*3
     char infos[50];
     strcpy(infos, "Le groupe n'a plus de vies, voulez vous rejouer? Y/N");
     mvwprintw(winInfos,0,0,"%s",infos);
     box(winInfos, ACS_VLINE, ACS_HLINE);
     wrefresh(winInfos);
-  	finDuJeu();	
+  	finDuJeu();
   }
-  
+
   void jeuWin(){
   	//*1
     finished=1;
-    
+
     //*2*3
     char infos[50];
     strcpy(infos, "Le mot a été trouvé, voulez vous rejouer? Y/N");
@@ -419,8 +419,8 @@ int main(int argc, char **argv) {
     if(motEntier==1){
       jeuWin();
     }
-    
-    
+
+
   }
   void addPointLoose(char * nomJ){
     int pts,i;
@@ -449,8 +449,8 @@ int main(int argc, char **argv) {
       jeuPerdu();
     }
   }
-  
-  
+
+
   void aff_hangman(){
     readHangman(hangman, ((lives-10)*-1));
     printHangman(winHangman, 1, 2, hangman);
@@ -462,25 +462,25 @@ int main(int argc, char **argv) {
     wrefresh(winWord);
     //si le mot est rempli, fin du jeu appelé par la fonction addPointsWin
   }
-  
+
   void *threadOthers(){
-    
-    char recu[200];
+
+    char recu[50];
     char lettre;
     char infos[50];
     char nomJ[20];
     int i=0;
     while(/*bool_mot_incomplet==1 && lives > 0*/1){
+
       while(read(socket_descriptor, recu, sizeof(recu))<1){
-        //err("erreur de reception server!");
       }
-      printf("mess recu :%s\n",recu);
+      printf("mess recu :%s---\n",recu);
       char typeMsg = recu[0];
       if (recu[1]!=':'){
         printf("erreur de reception\n");
         break;
       }
-      strcpy(recu,strchr(recu, ':')+1);
+      //strcpy(recu,strchr(recu, ':')+1);
       switch (typeMsg){
         case 'c'://----------connection nouveau client
         //c:nomDuJoueur.
@@ -502,7 +502,7 @@ int main(int argc, char **argv) {
         break;
         case 'v'://----------réponse d'un client (potentiellement nous) Bonne !
         //v:LettreEnvoyée,motHache,nomDuJoueur.
-        
+
         lettre=recu[0];
         strtok(recu,",");
         strcpy(word,strtok(NULL,","));
@@ -517,7 +517,7 @@ int main(int argc, char **argv) {
         break;
         case 'f'://----------réponse d'un client (potentiellement nous) Fausse !
         //f:LettreEnvoyée,nomDuJoueur.
-        
+
         lettre=recu[0];
         printf("%d\n",i);i++;
         printf("lettre :%c\n",lettre);
@@ -525,7 +525,7 @@ int main(int argc, char **argv) {
         strcpy(nomJ,strtok(NULL,"."));
         printf("%d\n",i);i++;
         printf("nomJ :%s\n",nomJ);
-        /*sprintf(infos,"%s propose %c",nomJ,lettre);
+        sprintf(infos,"%s propose %c",nomJ,lettre);
         printf("%d\n",i);i++;
         wcolor_set(winInfos,RED_B,NULL);
         printf("%d\n",i);i++;
@@ -533,11 +533,11 @@ int main(int argc, char **argv) {
         aff_hangman();
         printf("%d\n",i);i++;
         addPointLoose(nomJ);
-        printf("%d\n",i);i++;*/
+        printf("%d\n",i);i++;
         if(strcmp(nomJ,pseudo) ==0){
           pasDeReponse=0;
         }
-        
+
         break;
         default://----------
         break;
@@ -549,13 +549,13 @@ int main(int argc, char **argv) {
       bzero(recu,200);*/
     }
   }
-  
+
   void initialisation(){
     char grandBuf[500];
-    
-    
+
+
     demandePseudo();
-    
+
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }
@@ -569,24 +569,24 @@ int main(int argc, char **argv) {
     strcpy(pseudo,bufTmp);
     mvprintw(ligne_init,0,"Votre pseudo sera: %s",bufTmp);
     ligne_init++;
-    
-    
+
+
     strcpy(bufTmp , strtok(NULL,"$"));
-    
+
     demandeJoueurs(bufTmp);
     strcpy(bufTmp , strtok(copie,"$"));
     strcpy(bufTmp , strtok(NULL,"$"));
     strcpy(bufTmp , strtok(NULL,"$"));
-    
+
     demandeLettres(bufTmp);
     refresh();
     sleep(1);
-    
+
   }
-  
-  
-  
-  
+
+
+
+
   //***************************PRGM PRINCIPAL***************************
   //-------------------- message d'accueil-----------------------
   mvprintw(4, (cols - 32)/2, "Voici un jeu de Pendu en Reseau !");
@@ -596,7 +596,7 @@ int main(int argc, char **argv) {
   mvprintw(rows - 2, cols - (33), "Pressez une touche pour continuer");
   refresh();
   getch(); /* Pause */
-  
+
   //-------------------- CONNEXION AU SERVEUR -----------------------
   clear();
   refresh();
@@ -604,7 +604,7 @@ int main(int argc, char **argv) {
   mvprintw(0,0,"Connexion au Serveur");
   color_set(WHITE_B, NULL);
   mvprintw(2, 0,"adresse du serveur  : %s \n", host);
-  
+
   if ((ptr_host = gethostbyname(host)) == NULL) {
     err("erreur : impossible de trouver le serveur a partir de son adresse.");
   }
@@ -612,30 +612,30 @@ int main(int argc, char **argv) {
   bcopy((char*)ptr_host->h_addr, (char*)&adresse_locale.sin_addr, ptr_host->h_length);
   adresse_locale.sin_family = AF_INET; /* ou ptr_host->h_addrtype; */
   adresse_locale.sin_port = htons(5042);
-  
+
   mvprintw(3, 0,"numero de port pour la connexion au serveur : %d \n", ntohs(adresse_locale.sin_port));
-  
+
   /* creation de la socket */
   if ((socket_descriptor = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     err("erreur : impossible de creer la socket de connexion avec le serveur.");
-    
+
   }
-  
+
   /* tentative de connexion au serveur dont les infos sont dans adresse_locale */
   if ((connect(socket_descriptor, (sockaddr*)(&adresse_locale), sizeof(adresse_locale))) < 0) {
     err("erreur : impossible de se connecter au serveur.");
-    
+
   }
-  
-  
+
+
   color_set(GREEN_B, NULL);
   mvprintw(rows/2,cols/2,"Connexion effectuée avec succès.");
   color_set(WHITE_B, NULL);
   mvprintw(rows - 2, cols - (33), "Pressez une touche pour continuer");
   getch();
-  
+
   initialisation();
-  
+
   clear();
   refresh();
   raw();
@@ -647,22 +647,22 @@ int main(int argc, char **argv) {
   winLetters = newwin(1, 26, 0, 0);
   winOthers = newwin(nbJoueurs+2,17,3,1);
   winInfos = newwin(4,50,rows/2 + 5, (cols-50)/2);
-  
+
   box(winHangman, ACS_VLINE, ACS_HLINE);
   box(winInfos, ACS_VLINE, ACS_HLINE);
   mvwprintw(winWord, 0, 0, "%s", word);
   mvwprintw(winLives, 0, 0, "vies : %d", lives);
   mvwprintw(winLetters, 0, 0, "%s", letters);
   wrefresh(winLetters);
-  
-  
+
+
   aff_hangman();
-  
+
   wrefresh(winWord);
   wrefresh(winLives);
   aff_scores();
   refresh();
-  
+
   char scannedChar = 0;
   char oldScannedChar = 0;
   char mess2serv[10];
@@ -670,7 +670,7 @@ int main(int argc, char **argv) {
     if(finished==0){
       nodelay(winHangman, 1);
       scannedChar = toupper(wgetch(winHangman));
-      
+
       nodelay(winHangman, 0);
       if(scannedChar >= 'A' && scannedChar <= 'Z'){
         if(checkLetter(scannedChar, letters) == -1){
@@ -678,19 +678,19 @@ int main(int argc, char **argv) {
           bzero(mess2serv,10);
           mess2serv[0]=scannedChar;
           //printf("envoie\n");
-          
-          if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
+
+          if ((write(socket_descriptor, mess2serv, 1)) < 0) {
             err("erreur : impossible d'ecrire le message destine au serveur.");
           }
           //attendre une reponse pour repartir
-          
+
           while(pasDeReponse==1){
             //TODO a garder, c'est juste pour debug server qu'on commente
-            
+
             sleep(1);
           }
           pasDeReponse=1;
-          
+
         }else{
           //faire clignoter la lettre
           if(isWarningDone){
@@ -704,7 +704,7 @@ int main(int argc, char **argv) {
             isWarningDone = false;
           }else{
             mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-            
+
             alreadyWroteIndex = checkLetter(scannedChar, letters);
             alreadyWroteLetter = scannedChar;
             wattrset(winLetters, A_REVERSE);
@@ -715,7 +715,7 @@ int main(int argc, char **argv) {
           }
         }
       }
-      
+
       if(isWarningDone==0){
         timeOfNow = time(NULL);
         if(difftime(timeOfNow, startBlinkTime) >= 2){
@@ -729,20 +729,19 @@ int main(int argc, char **argv) {
       sleep(2);
       //on attend que les joueurs décident de continuer
     }
-    
-  }
-  
-  
-  endwin();
-  
-  
-  printf("\nfin de la reception. %d\n", socket_descriptor);
-  
-  close(socket_descriptor);
-  
-  printf("connexion avec le serveur fermee, fin du programme.\n");
-  
-  exit(0);
-  
-}
 
+  }
+
+
+  endwin();
+
+
+  printf("\nfin de la reception. %d\n", socket_descriptor);
+
+  close(socket_descriptor);
+
+  printf("connexion avec le serveur fermee, fin du programme.\n");
+
+  exit(0);
+
+}
