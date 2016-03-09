@@ -64,7 +64,7 @@ void init_pseudo(thread_socket* tSock, char* buffer){
     char str[5];
     sprintf(str,"%d",tSock->socket);
     strcat(pseudo, str);
-    tSock->pseudo = malloc(15*sizeof(char));
+    //tSock->pseudo = malloc(15*sizeof(char));
     strcpy(tSock->pseudo, pseudo);
 
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
@@ -143,8 +143,11 @@ void initialisation(thread_socket* tSock){
 	printf(" buffer final : %s\n", buffer);
 	write(tSock->socket,buffer,strlen(buffer));
 	
-	char message[20] = "c:";
+	char message[20];
+	bzero(message,20);
+	strcpy(message,"c:");
 	strcat(message,tSock->pseudo);
+	strcat(message,".\0");
 	
 	int i = 0;
     for(i; i < socket_tab_size; i++){
@@ -485,7 +488,9 @@ main(int argc, char **argv) {
 				exit(1);
 			}
 			socket_tab[socket_tab_size] = nouv_socket;
-
+			socket_tab[socket_tab_size]->pseudo= malloc(15*sizeof(char));
+			strcpy(socket_tab[socket_tab_size]->pseudo, "NoPseudoYet");
+			socket_tab[socket_tab_size]->points=10;
 			socket_tab_size++;
 			printf("nouveau client, taille tab=%d\n",socket_tab_size);
 			// on veut 1 thread qui s'occupe de chaque client

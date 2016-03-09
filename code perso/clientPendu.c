@@ -484,11 +484,12 @@ int main(int argc, char **argv) {
     char infos[50];
     char nomJ[20];
     int i=0;
+    int boolJoueurInconnu=0;
     while(/*bool_mot_incomplet==1 && lives > 0*/1){
 
       while(read(socket_descriptor, recu, sizeof(recu))<1){
       }
-      //printf("mess recu :%s---\n",recu);
+      printf("mess recu :%s---\n",recu);
       char typeMsg = recu[0];
       if (recu[1]!=':'){
         printf("erreur de reception\n");
@@ -506,10 +507,21 @@ int main(int argc, char **argv) {
         mvwprintw(winInfos,1,2,"%s",infos);
         wrefresh(winInfos);
         wcolor_set(winInfos,WHITE_B,NULL);
-        tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
-        strcpy(tabJoueurs[nbJoueurs]->nom,nomJ);
-        strcpy(tabJoueurs[nbJoueurs]->points,"10");
+        boolJoueurInconnu=0;
+        for(i=0;i<nbJoueurs;i++){
+          if(strcmp(tabJoueurs[i]->nom,"NoPseudoYet")==0){
+            boolJoueurInconnu=1;
+            strcpy(tabJoueurs[i]->nom,nomJ);
+            break;
+          }
+        }
+        if(boolJoueurInconnu==0){
+          tabJoueurs[nbJoueurs]= malloc(sizeof(joueur));
+          strcpy(tabJoueurs[nbJoueurs]->nom,nomJ);
+          strcpy(tabJoueurs[nbJoueurs]->points,"10");
         nbJoueurs++;
+        }
+        
         aff_scores();
         break;
         case 'd'://----------Déconnection client
