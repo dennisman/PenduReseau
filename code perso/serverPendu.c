@@ -51,13 +51,6 @@ lettre_commun lettres;
 /*------------------------------------------------------*/
 
 
-
-
-
-
-
-
-
 //ETAPE 1 de l'initialisation: pseudo
 void init_pseudo(thread_socket* tSock, char* buffer){
 
@@ -151,7 +144,7 @@ void initialisation(thread_socket* tSock){
 	write(tSock->socket,buffer,strlen(buffer));
 	
 	char message[20] = "c:";
-	strcat(message,tSock->pseudo;);
+	strcat(message,tSock->pseudo);
 	
 	int i = 0;
     for(i; i < socket_tab_size; i++){
@@ -249,7 +242,40 @@ void renvoi(char message[]){
 	}
 }
 
-void jeu(thread_socket* tSock){
+
+char finJeu(thread_socket* tSock){
+    char buffer[50];
+    char res = 'F';
+    
+    if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+        if (buffer[1] == 'Y'){
+            res ='Y';
+        }
+    }
+    
+    return res;
+
+}
+
+//fonction qui renvoie t si le jeu est fini sinon f
+char jeuFini(){
+    char res = 'f';
+    if(lettres.lettre_trouve_fausse[9]!= '\0'){
+        res = 't';
+    }
+    int i;
+    for(i = 0; i < strlen(lettres.mot); i++)
+	{
+		if(lettres.mot[i] != lettres.motHache[i])
+		{
+			res = 'f';
+		}
+	}
+    return res;
+}
+
+char jeu(thread_socket* tSock){
+    char res;
 	char buffer[50];
 
 	char envoi[50];
@@ -262,7 +288,7 @@ void jeu(thread_socket* tSock){
       bzero(buffer,50);
 		sleep(1);
      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
-		//if(buffer[1] != 'e'){
+		if(buffer[0] != 27){
 			printf("buff:%s \n",buffer);
 			char tmp[50];
 			pendu(buffer[0],tmp);
@@ -272,18 +298,27 @@ void jeu(thread_socket* tSock){
 			strcat(envoi,".\0");
 
 			renvoi(envoi);
-      printf("envoie:%s \n",envoi);
-		/*} else {
+            printf("envoie:%s \n",envoi);
+            
+            
+		} else {
 			fin = 1;
 			strcat(envoi,"d:");
 			strcat(envoi,pseudo);
 			renvoi(envoi);
-		}*/
+		}
+		
+		if(jeuFini() == 't'){
+		    res = finJeu(tSock);
+		    fin = 1;
+		}
 
      }
 
 
     }
+    
+    return res;
 
 }
 
@@ -342,8 +377,12 @@ main(int argc, char **argv) {
 
 		//printf("%s \n",tmp);
 		//write(thread_sock->socket,tmp,sizeof(tmp));
-        jeu(thread_sock);
-        sleep(10);
+        while(jeu(thread_sock) == 'Y');{
+            initialisationMot();
+            
+            
+        }
+        sleep(5);
         close(thread_sock->socket );
         (void) p_data;
         return NULL;
