@@ -406,6 +406,8 @@ int main(int argc, char **argv) {
     int pts;
     char* ptsStr;
     for(i=0; i<nbJoueurs;i++){
+      //printf("nomJ %s\n",nomJ);
+      //printf("nomjoueur %s\n",tabJoueurs[i]->nom );
       if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
         j=i;
         pts= atoi( tabJoueurs[i]->points);
@@ -417,8 +419,9 @@ int main(int argc, char **argv) {
             pts++;
           }
         }
+        break;
       }
-      break;
+
     }
     if(motEntier==1){
       pts = pts +10;
@@ -535,7 +538,7 @@ int main(int argc, char **argv) {
         aff_word();
         //printf("**3**\n");
         addPointWin(nomJ,lettre);
-        printf("**1**\n");
+        //printf("**1**\n");
         if(strcmp(nomJ,pseudo) ==0){
           pasDeReponse=0;
         }
