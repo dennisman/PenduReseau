@@ -301,18 +301,20 @@ int main(int argc, char **argv) {
     //*3
     char scannedChar;
     do{
-      nodelay(winHangman, 1);
+      //nodelay(winHangman, 1);
       scannedChar = toupper(wgetch(winHangman));
-      nodelay(winHangman, 0);
+      //nodelay(winHangman, 0);
+      printf("scna %c\n",scannedChar);
     }while(scannedChar != 'Y' && scannedChar != 'N');
 
     if(scannedChar == 'Y'){
       //*4
       char envoi[300];
       strcpy(envoi, "$");
-      envoi[7]=scannedChar;
+      envoi[1]=scannedChar;
+      envoi[2]='\0';
       write(socket_descriptor, envoi, strlen(envoi));
-
+      printf("envoi %s\n",envoi);
       //*5
       bzero(envoi,300);
       /*le serveur a attendu que tout les clients repondent
@@ -320,7 +322,6 @@ int main(int argc, char **argv) {
       donnees:motHache$others:j1,pts;j2,pts;.
       */
       read(socket_descriptor, envoi, sizeof(envoi));
-
       //*6
       strcpy(word , strtok(envoi,"$"));
       //surement des erreurs par la, tests a faire
@@ -343,6 +344,10 @@ int main(int argc, char **argv) {
       */
       ;
     }else{
+      char c=27;
+      char mess[10];
+      mess[0]=c;
+      write(socket_descriptor, mess, 1);
       closeExit();
     }
 
@@ -403,7 +408,7 @@ int main(int argc, char **argv) {
     for(i=0; i<nbJoueurs;i++){
       if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
         j=i;
-        pts= atoi( tabJoueurs[i]->points );
+        pts= atoi( tabJoueurs[i]->points);
         for (i=0;i<strlen(word);i++){
           if(word[i]=='_'){
             motEntier=0;
@@ -527,12 +532,14 @@ int main(int argc, char **argv) {
         mvwprintw(winInfos,1,2,"%s",infos);
         wrefresh(winInfos);
         wcolor_set(winInfos,WHITE_B,NULL);
-
         aff_word();
+        //printf("**3**\n");
         addPointWin(nomJ,lettre);
+        printf("**1**\n");
         if(strcmp(nomJ,pseudo) ==0){
           pasDeReponse=0;
         }
+        //printf("**2**\n");
         break;
         case 'f'://----------réponse d'un client (potentiellement nous) Fausse !
         //f:LettreEnvoyée,nomDuJoueur.
@@ -688,31 +695,32 @@ int main(int argc, char **argv) {
   int scannedInt=0;
   char oldScannedChar = 0;
   char mess2serv[10];
-  while(/*bool_mot_incomplet==1 && lives > 0*/1){
+  while(1){
     if(finished==0){
       //nodelay(winHangman, 1);
       scannedInt=wgetch(winHangman);
       scannedChar = toupper(scannedInt);
       //nodelay(winHangman, 0);
       if(scannedChar >= 'A' && scannedChar <= 'Z'){
-        if(checkLetter(scannedChar, letters) == -1){
-          //envoyer au serveur
-          bzero(mess2serv,10);
-          mess2serv[0]=scannedChar;
-          //printf("envoie\n");
+        if(checkLetter(scannedChar, letters) == -1 ){
+          if(checkLetter(scannedChar, word)==-1){
+            //envoyer au serveur
+            bzero(mess2serv,10);
+            mess2serv[0]=scannedChar;
+            //printf("envoie\n");
 
-          if ((write(socket_descriptor, mess2serv, 1)) < 0) {
-            err("erreur : impossible d'ecrire le message destine au serveur.");
-          }
-          //attendre une reponse pour repartir
+            if ((write(socket_descriptor, mess2serv, 1)) < 0) {
+              err("erreur : impossible d'ecrire le message destine au serveur.");
+            }
+            //attendre une reponse pour repartir
 
-          while(pasDeReponse==1){
-            //TODO a garder, c'est juste pour debug server qu'on commente
-
-            sleep(1);
-          }
-          pasDeReponse=1;
-
+            while(pasDeReponse==1){
+              //TODO a garder, c'est juste pour debug server qu'on commente
+              //printf("attente\n");
+              sleep(1);
+            }
+            pasDeReponse=1;
+        }
         }else{
           //faire clignoter la lettre
           if(isWarningDone){
@@ -736,6 +744,7 @@ int main(int argc, char **argv) {
             startBlinkTime = time(NULL);
           }
         }
+
       }else{
         //si on appuie sur echap
         if(scannedInt==27){
