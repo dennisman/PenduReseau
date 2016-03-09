@@ -152,6 +152,7 @@ int main(int argc, char **argv) {
   int ligne_init=0;
   curs_set(1);
   int pasDeReponse=1;
+  int finished = 0;
 
   //***************************Fonctions ***************************
   void err(char * aff){
@@ -287,10 +288,72 @@ int main(int argc, char **argv) {
   }
   void finDuJeu(){
 	  //TODO
+	  //*1
+	  finished=1;
+	  
+	  //*2*3
+	  char infos[50];
+	  strcpy(infos, "Le mot a été trouvé, voulez vous rejouer? Y/N");
+	  mvwprintw(winInfos,0,0,"%s",infos);
+  	box(winInfos, ACS_VLINE, ACS_HLINE);
+  	wrefresh(winInfos);
+  	
+  	//*3
+  	char scannedChar;
+  	do{
+  	  nodelay(winHangman, 1);
+      scannedChar = toupper(wgetch(winHangman));
+      nodelay(winHangman, 0);
+  	}while(scannedChar != 'Y' && scannedChar != 'N');
+  	
+  	//*4
+  	char envoi[50];
+  	strcpy(envoi, "Rejoue:");
+  	envoi[7]=scannedChar;
+  	write(socket_descriptor, envoi, sizeof(envoi));
+  	
+  	//*5
+  	
+  	
+  	
+	  /*
+	   1*arreter la boucle qui demande les touches au joueur 
+	   (if avec un var globale)
+	   2*affichage des scores/signalement fin
+	   3*on demande aux utilisateurs si il veulent rejouer
+	  4*envoie au serveur
+	  5*renvoie du mot par le serveur et les mecs connectés (max rep 20 sec)
+	  6*maj mecs co
+	  7*reprendre la boucle
+	  */
+	  //*7
+	  finished = 0;
 	}
 	void jeuPerdu(){
+	  finished = 1;
 	  
+	  
+	  
+	  finished = 0;
 	}
+  void aff_scores(){
+    werase(winOthers);
+    wrefresh(winOthers);
+    int i;
+    char nomJ[15];
+    for(i=0; i<nbJoueurs;i++){
+      strcpy(nomJ, tabJoueurs[i]->nom);
+      if(strcmp(nomJ, pseudo)==0){
+       wcolor_set(winOthers,GREEN_B,NULL);
+        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
+        wcolor_set(winOthers,WHITE_B,NULL);
+      }else{
+        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
+      }
+    }
+    box(winOthers, ACS_VLINE, ACS_HLINE);
+    wrefresh(winOthers);
+  }
   void addPointWin(char * nomJ, char lettre){
     int i;
     int j;
@@ -316,6 +379,7 @@ int main(int argc, char **argv) {
       pts = pts +10;
     }
     sprintf(tabJoueurs[j]->points,"%d",pts);
+    aff_scores();
     if(motEntier==1){
       finDuJeu();
     }
@@ -335,6 +399,7 @@ int main(int argc, char **argv) {
         break;
       }
     }
+    aff_scores();
     if (lives<1){
       for(i=0; i<nbJoueurs;i++){
          pts= atoi( tabJoueurs[i]->points );
@@ -344,27 +409,11 @@ int main(int argc, char **argv) {
         }
          sprintf(tabJoueurs[i]->points,"%d",pts);
       }
+      aff_scores();
       jeuPerdu();
     }
   }
-  void aff_score(){
-    werase(winOthers);
-    wrefresh(winOthers);
-    int i;
-    char nomJ[15];
-    for(i=0; i<nbJoueurs;i++){
-      strcpy(nomJ, tabJoueurs[i]->nom);
-      if(strcmp(nomJ, pseudo)==0){
-       wcolor_set(winOthers,GREEN_B,NULL);
-        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
-        wcolor_set(winOthers,WHITE_B,NULL);
-      }else{
-        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
-      }
-    }
-    box(winOthers, ACS_VLINE, ACS_HLINE);
-    wrefresh(winOthers);
-  }
+ 
 
   void aff_hangman(){
     readHangman(hangman, ((lives-10)*-1));
@@ -403,7 +452,7 @@ int main(int argc, char **argv) {
     		strcpy(tabJoueurs[nbJoueurs]->nom,nomJ);
     		strcpy(tabJoueurs[nbJoueurs]->points,"10");
     		nbJoueurs++;
-    		aff_score();
+    		aff_scores();
     	break;
     	case 'd'://----------Déconnection client
     		//d:nomDuJoueur.
@@ -411,7 +460,7 @@ int main(int argc, char **argv) {
     		sprintf(infos,"%s s'est déconnecté",nomJ);
     		wcolor_set(winInfos,CYAN_B,NULL);
     		suppJoueur(nomJ);
-    		aff_score();
+    		aff_scores();
     	break;
     	case 'v'://----------réponse d'un client (potentiellement nous) Bonne !
     		//v:LettreEnvoyée,motHache,nomDuJoueur.
@@ -549,7 +598,7 @@ int main(int argc, char **argv) {
 	winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
 	winLetters = newwin(1, 26, 0, 0);
 	winOthers = newwin(nbJoueurs+2,17,3,1);
-	winInfos = newwin(4,30,rows/2 + 5, (cols-30)/2);
+	winInfos = newwin(4,50,rows/2 + 5, (cols-50)/2);
 	
   box(winHangman, ACS_VLINE, ACS_HLINE);
   box(winInfos, ACS_VLINE, ACS_HLINE);
@@ -563,69 +612,75 @@ int main(int argc, char **argv) {
   
   wrefresh(winWord);
   wrefresh(winLives);
-  aff_score();
+  aff_scores();
   refresh();
 
-    char scannedChar = 0;
-  	char oldScannedChar = 0;
-	  char mess2serv[10];
-    while(/*bool_mot_incomplet==1 && lives > 0*/1){
-      nodelay(winHangman, 1);
-		  scannedChar = toupper(wgetch(winHangman));
-		  
-		  nodelay(winHangman, 0);
-		  if(scannedChar >= 'A' && scannedChar <= 'Z'){
-			  if(checkLetter(scannedChar, letters) == -1){
-				  //envoyer au serveur
-				  bzero(mess2serv,10);
-				  mess2serv[0]=scannedChar;
-				  //printf("envoie\n");
-				  
-				  if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
-      				err("erreur : impossible d'ecrire le message destine au serveur.");
-    			}
-    			//attendre une reponse pour repartir
-    			
-    			while(pasDeReponse==1){//TODO a garder, c'est juste pour debug server qu'on commente
-    			
-    			  sleep(1);
-    			}
-    			pasDeReponse=1;
+  char scannedChar = 0;
+	char oldScannedChar = 0;
+  char mess2serv[10];
+  while(/*bool_mot_incomplet==1 && lives > 0*/1){
+      if(finished==0){
+        nodelay(winHangman, 1);
+		    scannedChar = toupper(wgetch(winHangman));
+		    
+		    nodelay(winHangman, 0);
+		    if(scannedChar >= 'A' && scannedChar <= 'Z'){
+			    if(checkLetter(scannedChar, letters) == -1){
+				    //envoyer au serveur
+				    bzero(mess2serv,10);
+				    mess2serv[0]=scannedChar;
+				    //printf("envoie\n");
+				    
+				    if ((write(socket_descriptor, mess2serv, sizeof(mess2serv))) < 0) {
+        				err("erreur : impossible d'ecrire le message destine au serveur.");
+      			}
+      			//attendre une reponse pour repartir
+      			
+      			while(pasDeReponse==1){//TODO a garder, c'est juste pour debug server qu'on commente
+      			
+      			  sleep(1);
+      			}
+      			pasDeReponse=1;
 				
-			  }else{
-				  //faire clignoter la lettre
-				  if(isWarningDone){
-					  alreadyWroteIndex = checkLetter(scannedChar, letters);
-					  alreadyWroteLetter = scannedChar;
-					  wattrset(winLetters, A_REVERSE);
-					  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-					  wattroff(winLetters, A_REVERSE);
-					  wrefresh(winLetters);
-					  startBlinkTime = time(NULL);
-					  isWarningDone = false;
-				  }else{
-					  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+			    }else{
+				    //faire clignoter la lettre
+				    if(isWarningDone){
+					    alreadyWroteIndex = checkLetter(scannedChar, letters);
+					    alreadyWroteLetter = scannedChar;
+					    wattrset(winLetters, A_REVERSE);
+					    mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+					    wattroff(winLetters, A_REVERSE);
+					    wrefresh(winLetters);
+					    startBlinkTime = time(NULL);
+					    isWarningDone = false;
+				    }else{
+					    mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
 
-					  alreadyWroteIndex = checkLetter(scannedChar, letters);
-					  alreadyWroteLetter = scannedChar;
-					  wattrset(winLetters, A_REVERSE);
-					  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-					  wattroff(winLetters, A_REVERSE);
-					  wrefresh(winLetters);
-					  startBlinkTime = time(NULL);
-				  }
-			  }
-		  }
+					    alreadyWroteIndex = checkLetter(scannedChar, letters);
+					    alreadyWroteLetter = scannedChar;
+					    wattrset(winLetters, A_REVERSE);
+					    mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+					    wattroff(winLetters, A_REVERSE);
+					    wrefresh(winLetters);
+					    startBlinkTime = time(NULL);
+				    }
+			    }
+		    }
 		
-		  if(isWarningDone==0){
-			  timeOfNow = time(NULL);
-			  if(difftime(timeOfNow, startBlinkTime) >= 2){
-				  wattroff(winLetters, A_REVERSE);
-				  mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
-				  wrefresh(winLetters);
-				  isWarningDone = 1;
-			  }
-		  }
+		    if(isWarningDone==0){
+			    timeOfNow = time(NULL);
+			    if(difftime(timeOfNow, startBlinkTime) >= 2){
+				    wattroff(winLetters, A_REVERSE);
+				    mvwaddch(winLetters, 0, alreadyWroteIndex, alreadyWroteLetter);
+				    wrefresh(winLetters);
+				    isWarningDone = 1;
+			    }
+		    }
+      }else{
+        sleep(2);
+        //on attend que les joueurs décident de continuer
+      }
+      
 	}
 
 
