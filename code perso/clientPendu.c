@@ -181,12 +181,14 @@ int main(int argc, char **argv) {
       getstr(pseudo);
       taille_pseudo = strlen(pseudo);
       if(taille_pseudo < 1|| taille_pseudo>10){
+      	erase();
+      	clear();
         color_set(RED_B, NULL);
         mvprintw(1,0,"erreur : Taille incorrecte, votre pseudo doit avoir de 1 à 10 caractères");
         mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
         color_set(WHITE_B, NULL);
-
-
+        mvprintw(0,(cols-strlen(msg))/2,"%s",msg);
+        refresh();
       }
     }while(taille_pseudo < 1|| taille_pseudo>10);
     clear();
@@ -358,10 +360,12 @@ int main(int argc, char **argv) {
 
     //*2*3
     char infos[50];
+    wcolor_set(winInfos,RED_B,NULL);
     strcpy(infos, "Le groupe n'a plus de vies, voulez vous rejouer? Y/N");
     mvwprintw(winInfos,1,2,"%s",infos);
     box(winInfos, ACS_VLINE, ACS_HLINE);
     wrefresh(winInfos);
+    wcolor_set(winInfos,WHITE_B,NULL);
   	finDuJeu();
   }
 
@@ -372,10 +376,12 @@ int main(int argc, char **argv) {
 
     //*2*3
     char infos[50];
+    wcolor_set(winInfos,GREEN_B,NULL);
     strcpy(infos, "Le mot a été trouvé, voulez vous rejouer? Y/N");
     mvwprintw(winInfos,1,2,"%s",infos);
     box(winInfos, ACS_VLINE, ACS_HLINE);
     wrefresh(winInfos);
+    wcolor_set(winInfos,WHITE_B,NULL);
     finDuJeu();
   }
 
