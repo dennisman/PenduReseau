@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
     color_set(WHITE_B, NULL);
     mvprintw(ligne_init, 0, "Envoie de votre pseudo (%s) au serveur ...", pseudo);
     ligne_init++;
-    if ((write(socket_descriptor, pseudo, strlen(pseudo))) < 0) {
+    if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
 
     }
@@ -304,7 +304,6 @@ int main(int argc, char **argv) {
       //nodelay(winHangman, 1);
       scannedChar = toupper(wgetch(winHangman));
       //nodelay(winHangman, 0);
-      printf("scna %c\n",scannedChar);
     }while(scannedChar != 'Y' && scannedChar != 'N');
 
     if(scannedChar == 'Y'){
@@ -313,7 +312,7 @@ int main(int argc, char **argv) {
       strcpy(envoi, "$");
       envoi[1]=scannedChar;
       envoi[2]='\0';
-      write(socket_descriptor, envoi, strlen(envoi));
+      write(socket_descriptor, envoi, strlen(envoi)+1);
       printf("envoi %s\n",envoi);
       //*5
       bzero(envoi,300);
@@ -347,7 +346,7 @@ int main(int argc, char **argv) {
       char c=27;
       char mess[10];
       mess[0]=c;
-      write(socket_descriptor, mess, 1);
+      write(socket_descriptor, mess, 2);
       closeExit();
     }
 
@@ -489,16 +488,21 @@ int main(int argc, char **argv) {
 
       while(read(socket_descriptor, recu, sizeof(recu))<1){
       }
-      printf("mess recu :%s---\n",recu);
+      //printf("mess recu :%s---\n",recu);
       char typeMsg = recu[0];
       if (recu[1]!=':'){
         printf("erreur de reception\n");
         break;
       }
-      strcpy(recu,strchr(recu, ':')+1);
+      char copie[50];
+      //la copie evite des erreurs
+      strcpy(copie,strchr(recu, ':')+1);
+      strcpy(recu,copie);
+      //printf("strchr recu :%s---\n",recu);
       switch (typeMsg){
         case 'c'://----------connection nouveau client
         //c:nomDuJoueur.
+        //printf("recu :%s\n",recu);
         strcpy(nomJ,strtok(recu,"."));
         sprintf(infos,"%s s'est connecté",nomJ);
         wcolor_set(winInfos,CYAN_B,NULL);
@@ -724,7 +728,7 @@ int main(int argc, char **argv) {
             mess2serv[0]=scannedChar;
             //printf("envoie\n");
 
-            if ((write(socket_descriptor, mess2serv, 1)) < 0) {
+            if ((write(socket_descriptor, mess2serv, 2)) < 0) {
               err("erreur : impossible d'ecrire le message destine au serveur.");
             }
             //attendre une reponse pour repartir
@@ -767,7 +771,7 @@ int main(int argc, char **argv) {
           mess2serv[0]=scannedChar;
           //printf("envoie\n");
 
-          if ((write(socket_descriptor, mess2serv, 1)) < 0) {
+          if ((write(socket_descriptor, mess2serv, 2)) < 0) {
             err("erreur : impossible d'ecrire le message destine au serveur.");
           }
           closeExit();

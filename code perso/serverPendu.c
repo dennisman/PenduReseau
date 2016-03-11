@@ -102,7 +102,7 @@ void init_others(char* buffer2){
 void init_mot(char* buffer){
   char buff[50] ="taille du mot:";
   char str[5];
-	sprintf(str,"%d",strlen(lettres.mot));
+	sprintf(str,"%d",strlen(lettres.mot)+1);
   strcat(buff, str);
   strcat(buffer, buff);
   //write(tSock->socket,buff,sizeof(buff));
@@ -141,19 +141,24 @@ void initialisation(thread_socket* tSock){
 	init_lettres(buffer);
 	strcat(buffer,"$");
 	printf(" buffer final : %s\n", buffer);
-	write(tSock->socket,buffer,strlen(buffer));
+	write(tSock->socket,buffer,strlen(buffer)+1);
 	
 	char message[20];
 	bzero(message,20);
 	strcpy(message,"c:");
 	strcat(message,tSock->pseudo);
-	strcat(message,".\0");
-	
+	strcat(message,".");
+	printf("connexion :%s", message);
 	int i = 0;
     for(i; i < socket_tab_size; i++){
         
-        if(socket_tab[i]->socket != tSock->socket)
-	    write(socket_tab[i]->socket,message,strlen(message));
+        if(socket_tab[i]->socket != tSock->socket){
+        	if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0)
+		    write(socket_tab[i]->socket,message,strlen(message)+1);
+			//+1 evite une erreur d'envoie
+			
+        }
+	    	
 		
 	}
 	
@@ -234,13 +239,12 @@ char* pendu(char lettrePropose, char res[]){
 }
 
 //envoie a tout les clients des données
-void renvoi(char message[]){
+void renvoi(char* message){
 
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
 
-			write(socket_tab[i]->socket,message,strlen(message)
-    );
+			write(socket_tab[i]->socket,message,strlen(message)+1);
 		
 	}
 }
@@ -301,7 +305,7 @@ char jeu(thread_socket* tSock){
 			printf("tmp:%s \n",tmp);
 			strcat(envoi,tmp);
 			strcat(envoi,pseudo);
-			strcat(envoi,".\0");
+			strcat(envoi,".");
 
 			renvoi(envoi);
             printf("envoie:%s \n",envoi);
@@ -478,7 +482,7 @@ main(int argc, char **argv) {
 
     /* attente des connexions et traitement des donnees recues */
     for(;;) {
-    	if(socket_tab_size<11){
+    	if(socket_tab_size<110){
 			longueur_adresse_courante = sizeof(adresse_client_courant);
 			/* adresse_client_courant sera renseigné par accept via les infos du connect */
 			thread_socket *nouv_socket = malloc(sizeof(thread_socket));
