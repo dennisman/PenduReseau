@@ -325,7 +325,10 @@ char finJeu(thread_socket* tSock, char buff[]){
         strcat(tmp,".");
         renvoi(tmp);
 		
-		reponses = {'a','a','a','a','a','a','a','a','a','a'};
+		for(i = 0; i < nbJoueur; i++){
+			reponses[i] = 'a';
+		}
+    }
         
     }
     return res;
