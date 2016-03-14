@@ -323,7 +323,7 @@ int main(int argc, char **argv) {
       envoi[1]=scannedChar;
       envoi[2]='\0';
       write(socket_descriptor, envoi, strlen(envoi)+1);
-      printf("envoi %s\n",envoi);
+      //printf("envoi %s\n",envoi);
       //*5
       bzero(envoi,300);
       /*le serveur a attendu que tout les clients repondent
@@ -333,7 +333,6 @@ int main(int argc, char **argv) {
       read(socket_descriptor, envoi, sizeof(envoi));
       //*6
       char copie[200];
-      printf("%s\n", envoi);
       strcpy(copie, strchr(envoi,':')+1);
       strcpy(word , strtok(copie,"$"));
       //surement des erreurs par la, tests a faire
@@ -341,7 +340,7 @@ int main(int argc, char **argv) {
       nbJoueurs =0;
       demandeJoueurs(envoi);
       //*7
-      //finished = 0
+      finished = 0
 
 
       /*
