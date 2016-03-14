@@ -40,7 +40,8 @@ typedef struct thread_socket {
 
 }thread_socket;
 
-char reponses[10];
+char reponses[10] = {0};
+int reponses_tab_size = 0;
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
 lettre_commun lettres;
@@ -174,7 +175,7 @@ void initialisationMot(){
 
 	piocherMot(lettres.mot);
 
-	printf(lettres.mot);
+	printf("mot:%s\n",lettres.mot);
 	int i =0;
 	while( i < 27){
 		if(checkLetter2(lettres.mot[i]) != -1){
@@ -277,23 +278,26 @@ char finJeu(thread_socket* tSock, char buff[]){
     char buffer[50];
     char res = 'F';
     int nbJoueur = socket_tab_size;
+    //printf("nbJoueur:%d \n",nbJoueur);
 
     if(buff[0] != '$'){
 
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
-	        printf("buff:%s \n",buffer);
+	        printf("buff1:%s \n",buffer);
             if (buffer[1] == 'Y'){
                 res ='Y';
             }
         }
     }
-    else {res = buff[1];printf("buff:%s \n",buff);}
+    else {res = buff[1];printf("buff2:%s \n",buff);}
     
-    reponses[tSock->socket] = res;
+    reponses[reponses_tab_size] = res;
+    reponses_tab_size ++;
     int i = 0;
     int flag = 1;
     for(i; i < nbJoueur; i++){
-        if(reponses[i]!='Y' || reponses[i]!='F'){
+        printf("reponses[%d]: %s \n",i,reponses[i]);
+        if(reponses[i]!='Y' && reponses[i]!='F'){
             flag = 0;
         }
     }
@@ -311,6 +315,7 @@ char finJeu(thread_socket* tSock, char buff[]){
             strcat(tmp,';');
         }
         strcat(tmp,'.');
+        printf("tmp:%s\n",tmp);
         renvoi(tmp);
         
     }
