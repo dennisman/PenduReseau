@@ -40,7 +40,7 @@ typedef struct thread_socket {
 
 }thread_socket;
 
-char reponses[10] = {0};
+char reponses[10] = {'a','a','a','a','a','a','a','a','a','a'};
 int reponses_tab_size = 0;
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
@@ -289,18 +289,24 @@ char finJeu(thread_socket* tSock, char buff[]){
             }
         }
     }
-    else {res = buff[1];printf("buff2:%s \n",buff);}
+    else {
+		res = buff[1];
+		printf("buff2:%s \n",buff);
+	}
     
     reponses[reponses_tab_size] = res;
     reponses_tab_size ++;
     int i = 0;
     int flag = 1;
     for(i; i < nbJoueur; i++){
-        printf("reponses[%d]: %s \n",i,reponses[i]);
-        if(reponses[i]!='Y' && reponses[i]!='F'){
-            flag = 0;
+        printf("reponses[%d]: %c \n",i,reponses[i]);
+        if(reponses[i] =='Y' ){}
+		else{
+			if(reponses[i]=='F'){}
+			else{flag = 0;}
         }
     }
+	//quand tout le monde a rendu la reponse
     if(flag == 1){
         //donnees:motHache$others:j1,pts;j2,pts;.
         char tmp[50] = "donnees:";
@@ -310,13 +316,16 @@ char finJeu(thread_socket* tSock, char buff[]){
         i = 0;
         for(i; i < socket_tab_size; ++i){
             strcat(tmp,socket_tab[i]->pseudo);
-            strcat(tmp,',');
-            strcat(tmp,socket_tab[i]->points);
-            strcat(tmp,';');
+            strcat(tmp,",");
+			char str[5];
+			sprintf(str,"%d",tSock->points);
+            strcat(tmp,str);
+            strcat(tmp,";");
         }
-        strcat(tmp,'.');
-        printf("tmp:%s\n",tmp);
+        strcat(tmp,".");
         renvoi(tmp);
+		
+		reponses = {'a','a','a','a','a','a','a','a','a','a'};
         
     }
     return res;
@@ -460,7 +469,7 @@ main(int argc, char **argv) {
 		//printf("%s \n",tmp);
 		//write(thread_sock->socket,tmp,sizeof(tmp));
         while(jeu(thread_sock) == 'Y'){
-            initialisationMot();
+            
             
             
         }
