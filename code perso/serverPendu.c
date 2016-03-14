@@ -71,7 +71,6 @@ void init_pseudo(thread_socket* tSock, char* buffer){
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
 	  strcpy(buffer, pseudo);
-	  printf("ok\n");
 
     //write(tSock->socket,repPseudo,sizeof(repPseudo));
   }
@@ -272,17 +271,23 @@ void renvoi(char* message){
 }
 
 
-void finJeu(thread_socket* tSock){
+char finJeu(thread_socket* tSock, char buff[]){
+
+
     char buffer[50];
     char res = 'F';
     int nbJoueur = socket_tab_size;
-    
-    if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
-		printf("buff:%s \n",buffer);
-        if (buffer[1] == 'Y'){
-            res ='Y';
+
+    if(buff[0] != '$'){
+
+        if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+	        printf("buff:%s \n",buffer);
+            if (buffer[1] == 'Y'){
+                res ='Y';
+            }
         }
     }
+    else {res = buff[1];printf("buff:%s \n",buff);}
     
     reponses[tSock->socket] = res;
     int i = 0;
@@ -309,7 +314,7 @@ void finJeu(thread_socket* tSock){
         renvoi(tmp);
         
     }
- 
+    return res;
 
 }
 
@@ -354,36 +359,43 @@ char jeu(thread_socket* tSock){
       bzero(buffer,50);
 		sleep(1);
      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
-		if(buffer[0] != 27){
-			printf("buff:%s \n",buffer);
+		
+		//si buffer[0] est different d'echap et de $
+		if(buffer[0] != 27 && buffer[0] != '$'){
+		
+			printf("buffer:%s \n",buffer);
 			char tmp[50];
 			pendu(buffer[0],tmp,tSock);
-			printf("tmp:%s \n",tmp);
 			strcat(envoi,tmp);
 			strcat(envoi,pseudo);
 			strcat(envoi,".");
 
 			renvoi(envoi);
             
+            if(jeuFini() == 't'){
+		    res = finJeu(tSock,"_");
+		    fin = 1;
+		    }
+
             
-		} else {
+            
+		} else if(buffer[0] == 27){
 			fin = 1;
 			strcat(envoi,"d:");
 			strcat(envoi,pseudo);
 			renvoi(envoi);
-		}
-		
-		if(jeuFini() == 't'){
-		    finJeu(tSock);
+		} else {
+		    res = finJeu(tSock,buffer);
 		    fin = 1;
 		}
-
+		
+		
      }
 
 
     }
     
-    
+    return res;
 
 }
 
