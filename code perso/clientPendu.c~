@@ -220,7 +220,10 @@ int main(int argc, char **argv) {
       err("erreur : Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
     }
     //COMPILER AVEC -g sinon erreur compil
-    strcpy(bufJoueurs,strchr(buffer2, ':')+1); // pe +1
+    char copie[256];
+    strcpy(copie, bufJoueurs);
+    strcpy(copie,strchr(buffer2, ':')+1); // pe +1
+    strcpy(bufJoueurs, copie);
     if(strlen(buffer2)==strlen(bufJoueurs)){
       err("erreur : mauvaise reception des autres joueurs");
 
@@ -259,7 +262,10 @@ int main(int argc, char **argv) {
     if(buff_lettres[0]!='l' || buff_lettres[15]!=':'){
       err("erreur lettres: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
     }
-    strcpy(buff_lettres,strchr(buff_lettres, ':')+1);
+    char copie[200];
+    strcpy(copie, buff_lettres);
+    strcpy(copie,strchr(buff_lettres, ':')+1);
+    strcpy(buff_lettres, copie);
     char* lettresTrouvees;
     lettresTrouvees=malloc(27*sizeof(char));
     lettresTrouvees= strtok(buff_lettres, ".");
@@ -269,8 +275,10 @@ int main(int argc, char **argv) {
     lettresFausses= strtok(NULL, "$");
     mvprintw(ligne_init, 0, "Mot : %s", lettresTrouvees);
     ligne_init++;
-
+	
+	strcpy(copie,lettresFausses);
     strcpy(lettresFausses,strchr(lettresFausses, ':')+1);
+    strcpy(lettresFausses, copie);
 
     int ind_let_i=0;
     char let_i = lettresFausses[ind_let_i];
@@ -310,7 +318,7 @@ int main(int argc, char **argv) {
 
     if(scannedChar == 'Y'){
       //*4
-      char envoi[300];
+      char envoi[200];
       strcpy(envoi, "$");
       envoi[1]=scannedChar;
       envoi[2]='\0';
@@ -324,6 +332,8 @@ int main(int argc, char **argv) {
       */
       read(socket_descriptor, envoi, sizeof(envoi));
       //*6
+      char copie[200];
+      printf("%s\n", envoi);
       strcpy(copie, strchr(envoi,':')+1);
       strcpy(word , strtok(copie,"$"));
       //surement des erreurs par la, tests a faire
@@ -331,7 +341,7 @@ int main(int argc, char **argv) {
       nbJoueurs =0;
       demandeJoueurs(envoi);
       //*7
-      finished = 0
+      //finished = 0
 
 
       /*
