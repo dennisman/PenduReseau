@@ -279,7 +279,8 @@ char finJeu(thread_socket* tSock, char buff[]){
     char res = 'F';
     int nbJoueur = socket_tab_size;
     //printf("nbJoueur:%d \n",nbJoueur);
-
+    //on réinitialises les lettres fausses
+    strcpy(lettres.lettre_trouve_fausse, "");
     if(buff[0] != '$'){
 
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
