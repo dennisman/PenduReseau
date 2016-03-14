@@ -262,6 +262,7 @@ char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 //envoie a tout les clients des données
 void renvoi(char* message){
 
+        printf("envoi:%s\n",message);
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
 
@@ -361,7 +362,6 @@ char jeu(thread_socket* tSock){
 			strcat(envoi,".");
 
 			renvoi(envoi);
-            printf("envoie:%s \n",envoi);
             
             
 		} else {
