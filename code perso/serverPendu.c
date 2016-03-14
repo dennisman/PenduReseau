@@ -40,6 +40,7 @@ typedef struct thread_socket {
 
 }thread_socket;
 
+char reponses[10];
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
 lettre_commun lettres;
@@ -188,7 +189,7 @@ void initialisationMot(){
 	//printf(lettres.motHache);
 }
 
-char* pendu(char lettrePropose, char res[]){
+char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 	unsigned int i;
 	int trouver = 0;
 	for(i = 0; i < strlen(lettres.mot); i++)
@@ -197,7 +198,9 @@ char* pendu(char lettrePropose, char res[]){
 		{
 			lettres.motHache[i] = lettres.mot[i];
 			trouver = 1;
+			tSock->points++;
 		}
+		
 	}
 	if(trouver == 0){
 		for(i = 0; i < 26; i++) {
@@ -216,6 +219,7 @@ char* pendu(char lettrePropose, char res[]){
 				res [1] = ':';
 				res [2] = lettrePropose;
 				res [3] = '\0';
+			    tSock->points--;
 
 			}
 
@@ -228,6 +232,23 @@ char* pendu(char lettrePropose, char res[]){
 		res [3] = ',';
 		res [4] = '\0';
 		strcat(res,lettres.motHache);
+		
+		int flag = 1;
+		
+		//on regarde si le mot a ete trouver
+		for(i = 0; i < strlen(lettres.mot); i++)
+	    {
+		    if(lettres.mot[i] != lettres.motHache[i])
+		    {
+			    flag = 0;
+		    }
+		
+	    }
+	    //si oui on lui ajoute 10 point
+	    if(flag == 1){
+	        tSock->points = tSock->points + 10;
+	    }
+		
 	}
 
 
@@ -250,9 +271,10 @@ void renvoi(char* message){
 }
 
 
-char finJeu(thread_socket* tSock){
+void finJeu(thread_socket* tSock){
     char buffer[50];
     char res = 'F';
+    int nbJoueur = socket_tab_size;
     
     if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
         if (buffer[1] == 'Y'){
@@ -260,7 +282,31 @@ char finJeu(thread_socket* tSock){
         }
     }
     
-    return res;
+    reponses[tSock->socket] = res;
+    int i = 0;
+    int flag = 1;
+    for(i; i < nbJoueur; i++){
+        if(reponses[i]!='Y' || reponses[i]!='F'){
+            flag = 0;
+        }
+    }
+    if(flag == 1){
+        //donnees:motHache$others:j1,pts;j2,pts;.
+        char tmp[50] = "donnees:";
+        initialisationMot();
+        strcat(tmp,lettres.motHache);
+        strcat(tmp,"$others:");
+        i = 0;
+        for(i; i < socket_tab_size; ++i){
+            strcat(tmp,socket_tab[i]->pseudo);
+            strcat(tmp,',');
+            strcat(tmp,socket_tab[i]->points);
+            strcat(tmp,';');
+        }
+        strcat(tmp,'.');
+        
+    }
+ 
 
 }
 
@@ -269,6 +315,13 @@ char jeuFini(){
     char res = 'f';
     if(lettres.lettre_trouve_fausse[9] >= 'A' && lettres.lettre_trouve_fausse[9] <= 'Z'){
         res = 't';
+        
+        //on enleve 3 points a tous les joueurs
+        int i = 0;
+        for(i; i < socket_tab_size; ++i){
+            socket_tab[i]->points -= 3;
+        }
+        
         return res;
     }
     res = 't';
@@ -301,7 +354,7 @@ char jeu(thread_socket* tSock){
 		if(buffer[0] != 27){
 			printf("buff:%s \n",buffer);
 			char tmp[50];
-			pendu(buffer[0],tmp);
+			pendu(buffer[0],tmp,tSock);
 			printf("tmp:%s \n",tmp);
 			strcat(envoi,tmp);
 			strcat(envoi,pseudo);
@@ -319,7 +372,7 @@ char jeu(thread_socket* tSock){
 		}
 		
 		if(jeuFini() == 't'){
-		    res = finJeu(tSock);
+		    finJeu(tSock);
 		    fin = 1;
 		}
 
@@ -328,7 +381,7 @@ char jeu(thread_socket* tSock){
 
     }
     
-    return res;
+    
 
 }
 
