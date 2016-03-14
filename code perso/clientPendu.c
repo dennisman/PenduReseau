@@ -310,7 +310,7 @@ int main(int argc, char **argv) {
 
     if(scannedChar == 'Y'){
       //*4
-      char envoi[300];
+      char envoi[200];
       strcpy(envoi, "$");
       envoi[1]=scannedChar;
       envoi[2]='\0';
@@ -324,7 +324,9 @@ int main(int argc, char **argv) {
       */
       read(socket_descriptor, envoi, sizeof(envoi));
       //*6
-      strcpy(word , strtok(envoi,"$"));
+      char copie[200];
+      strcpy(copie, strchr(envoi,':')+1);
+      strcpy(word , strtok(copie,"$"));
       //surement des erreurs par la, tests a faire
       strcpy(envoi , strtok(NULL,"$"));
       nbJoueurs =0;
@@ -721,14 +723,16 @@ int main(int argc, char **argv) {
   char oldScannedChar = 0;
   char mess2serv[10];
   while(1){
-    if(finished==0){
+    
       //nodelay(winHangman, 1);
       scannedInt=wgetch(winHangman);
       scannedChar = toupper(scannedInt);
       //nodelay(winHangman, 0);
+    if(finished==0){
       if(scannedChar >= 'A' && scannedChar <= 'Z'){
         if(checkLetter(scannedChar, letters) == -1 ){
           if(checkLetter(scannedChar, word)==-1){
+          	
             //envoyer au serveur
             bzero(mess2serv,10);
             mess2serv[0]=scannedChar;
@@ -794,7 +798,7 @@ int main(int argc, char **argv) {
         }
       }
     }else{
-      sleep(2);
+      sleep(5);
       //on attend que les joueurs décident de continuer
     }
 
