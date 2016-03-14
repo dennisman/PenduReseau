@@ -278,6 +278,7 @@ void finJeu(thread_socket* tSock){
     int nbJoueur = socket_tab_size;
     
     if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+		printf("buff:%s \n",buffer);
         if (buffer[1] == 'Y'){
             res ='Y';
         }
@@ -305,6 +306,7 @@ void finJeu(thread_socket* tSock){
             strcat(tmp,';');
         }
         strcat(tmp,'.');
+        renvoi(tmp);
         
     }
  
