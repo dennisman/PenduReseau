@@ -406,10 +406,8 @@ int main(int argc, char **argv) {
       */
       ;
     }else{
-      char c=27;
-      char mess[10];
-      mess[0]=c;
-      write(socket_descriptor, mess, 2);
+      char mess[10]="$N";
+      write(socket_descriptor, mess, 3);
       closeExit();
     }
 

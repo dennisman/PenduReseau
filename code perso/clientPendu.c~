@@ -386,6 +386,12 @@ int main(int argc, char **argv) {
   	werase(winLetters);
     mvwprintw(winLetters, 0, 0, "%s", letters);
     wrefresh(winLetters);
+    wcolor_set(winInfos,CYAN_B,NULL);
+    werase(winInfos);
+    box(winInfos, ACS_VLINE, ACS_HLINE);
+    mvwprintw(winInfos,1,2,"Nouveau Jeu !");
+    wrefresh(winInfos);
+    wcolor_set(winInfos,WHITE_B,NULL);
 
 
       /*

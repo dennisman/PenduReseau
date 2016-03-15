@@ -25,7 +25,7 @@ typedef struct servent servent;
 typedef struct lettre_commun {
 
     char mot[27];
-    char lettre_trouve_fausse[26];
+    char lettre_trouve_fausse[10];
     char motHache[27];
 
 }lettre_commun;
@@ -45,12 +45,39 @@ int reponses_tab_size = 0;
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
 lettre_commun lettres;
+int phase_rejouer = 0;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
 //TODO verifier le renvoie des BONNES données quand on rejoue, en particulier les lettresFausses et mot haché"; ou est initialisé le tab de lettres fausses ?
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
+
+
+void deconnexion(thread_socket* thread_sock){
+    int i;
+    for(i=0; i<socket_tab_size;i++){
+      if(strcmp(thread_sock->pseudo, socket_tab[i]->pseudo)==0){
+        socket_tab[i]=socket_tab[socket_tab_size-1];
+        socket_tab[socket_tab_size-1] = NULL;
+        socket_tab_size--;
+        break;
+      }
+      
+    }
+    
+    if(phase_rejouer == 0){
+    	char envoi[50];
+        strcpy(envoi,"");
+        char * pseudo = thread_sock->pseudo ;
+        strcat(envoi,"d:");
+        strcat(envoi,pseudo);
+        renvoi(envoi);
+        printf("envoie deco %d \n",i);
+        ++i;
+    }
+        
+}
 
 
 //ETAPE 1 de l'initialisation: pseudo
@@ -60,20 +87,20 @@ void init_pseudo(thread_socket* tSock, char* buffer){
   char pseudo[12]="";
   if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) < 0){
       //TODO supp ce joueur et envoyer aux autre sa déco !
+      printf("deco a l'init \n");
+      deconnexion(tSock);
   }else{
     // creation du pseudo concaténé avec son numéro de socket
     strcpy(pseudo, buffer_pseudo);
     char str[5];
     sprintf(str,"%d",tSock->socket);
     strcat(pseudo, str);
-    //tSock->pseudo = malloc(15*sizeof(char));
     strcpy(tSock->pseudo, pseudo);
 
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
 	  strcpy(buffer, pseudo);
 
-    //write(tSock->socket,repPseudo,sizeof(repPseudo));
   }
 }
 
@@ -93,75 +120,66 @@ void init_others(char* buffer2){
 		strcat(buffer,";");
 	}
 	strcat(buffer,".");
-	printf ("users : %s\n", buffer);
 
 	strcat(buffer2,buffer);
-	//write(tSock->socket,buffer2,sizeof(buffer2));
-	  printf("ok\n");
 
 }
 void init_mot(char* buffer){
   char buff[50] ="taille du mot:";
   char str[5];
-	sprintf(str,"%d",strlen(lettres.mot)+1);
+  sprintf(str,"%d",strlen(lettres.mot)+1);
   strcat(buff, str);
   strcat(buffer, buff);
-  //write(tSock->socket,buff,sizeof(buff));
   printf("%s\n", buff);
 
 }
 
 void init_lettres(char* buffer){
 
-    char buffer2[200]="lettresTrouvees:";
+   char buffer2[200]="lettresTrouvees:";
 
    strcat(buffer2,lettres.motHache);
-   //strcat(buffer2,"ABC"); //pour debugage client
    strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
-   //strcat(buffer2,"DEF");//pour debugage client
    strcat(buffer2,".");
    strcat(buffer, buffer2);
-
-    //write(tSock->socket,buffer,sizeof(buffer));
+   
 }
 
 void initialisation(thread_socket* tSock){
-  tSock->points = 10;
-  char buffer[500]="";
-  char dollar[1] = "$";
-	init_pseudo(tSock, buffer);
-	strcat(buffer,"$");
-	//ETAPE 2: envoie des données des autres utilisateurs
-	//pour chaque personne dans le tableau de socket, on envoie
-	//son pseudo et ses points
-	init_others(buffer);
-	strcat(buffer,"$");
-	//init_mot(buffer);
-	//strcat(buffer,dollar);
-	init_lettres(buffer);
-	strcat(buffer,"$");
-	printf(" buffer final : %s\n", buffer);
-	write(tSock->socket,buffer,strlen(buffer)+1);
-	
-	char message[20];
-	bzero(message,20);
-	strcpy(message,"c:");
-	strcat(message,tSock->pseudo);
-	strcat(message,".");
-	printf("connexion :%s", message);
-	int i = 0;
+    tSock->points = 10;
+    char buffer[500]="";
+    char dollar[1] = "$";
+    init_pseudo(tSock, buffer);
+    strcat(buffer,"$");
+    //ETAPE 2: envoie des données des autres utilisateurs
+    //pour chaque personne dans le tableau de socket, on envoie
+    //son pseudo et ses points
+    init_others(buffer);
+    strcat(buffer,"$");
+    init_lettres(buffer);
+    strcat(buffer,"$");
+    printf(" buffer final : %s\n", buffer);
+    write(tSock->socket,buffer,strlen(buffer)+1);
+
+    char message[20];
+    bzero(message,20);
+    strcpy(message,"c:");
+    strcat(message,tSock->pseudo);
+    strcat(message,".");
+    printf("connexion :%s", message);
+    int i = 0;
     for(i; i < socket_tab_size; i++){
         
         if(socket_tab[i]->socket != tSock->socket){
         	if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0)
-		    write(socket_tab[i]->socket,message,strlen(message)+1);
-			//+1 evite une erreur d'envoie
-			
-        }
-	    	
+	        write(socket_tab[i]->socket,message,strlen(message)+1);
+		    //+1 evite une erreur d'envoie
 		
-	}
+        }
+        	
+	
+    }
 	
 	
   //read(tSock->socket,buffer,sizeof(buffer));
@@ -183,10 +201,11 @@ void initialisationMot(){
 		}else{
 			lettres.motHache[i] = '\0';
 		}
-		//lettres.lettre_trouve_fausse[i] = '%';
+		if(i<10){lettres.lettre_trouve_fausse[i] = '\0';}
+				
 		i++;
 	}
-	//printf(lettres.motHache);
+	phase_rejouer = 0;
 }
 
 char* pendu(char lettrePropose, char res[],thread_socket* tSock){
@@ -251,6 +270,7 @@ char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 		
 	}
 
+    printf("point: %d \n",tSock->points);
 
 	strcat(res,",\0");
 
@@ -268,6 +288,8 @@ void renvoi(char* message){
 
 			if(write(socket_tab[i]->socket,message,strlen(message)+1)<0){
 				//TODO supp ce joueur et envoyer aux autre sa déco !
+				printf("renoie\n");
+				deconnexion(socket_tab[i]);
 			}
 		
 	}
@@ -278,11 +300,9 @@ char finJeu(thread_socket* tSock, char buff[]){
 
 
     char buffer[50];
-    char res = 'F';
+    char res = 'N';
     int nbJoueur = socket_tab_size;
-    //printf("nbJoueur:%d \n",nbJoueur);
     //on réinitialises les lettres fausses
-    strcpy(lettres.lettre_trouve_fausse, "");
     if(buff[0] != '$'){
 
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
@@ -292,6 +312,9 @@ char finJeu(thread_socket* tSock, char buff[]){
             }
         }else{
         	//TODO supp ce joueur et envoyer aux autre sa déco !
+				printf("finjeu\n");
+        	deconnexion(tSock);
+        	return res;
         }
     }
     else {
@@ -305,11 +328,9 @@ char finJeu(thread_socket* tSock, char buff[]){
     int flag = 1;
     for(i; i < nbJoueur; i++){
         printf("reponses[%d]: %c \n",i,reponses[i]);
-        if(reponses[i] =='Y' ){}
-		else{
-			if(reponses[i]=='F'){}
-			else{flag = 0;}
-        }
+        if(reponses[i] !='Y' && reponses[i] !='N' ){flag = 0;}
+        printf("flag: %d \n",flag);
+        
     }
 	//quand tout le monde a rendu la reponse
     if(flag == 1){
@@ -324,6 +345,7 @@ char finJeu(thread_socket* tSock, char buff[]){
             strcat(tmp,",");
 			char str[5];
 			sprintf(str,"%d",tSock->points);
+			printf("point: %d \n",tSock->points);
             strcat(tmp,str);
             strcat(tmp,";");
         }
@@ -369,7 +391,7 @@ char jeuFini(){
 }
 
 char jeu(thread_socket* tSock){
-    char res;
+    char res = 'F';
 	char buffer[50];
 
 	char envoi[50];
@@ -380,10 +402,10 @@ char jeu(thread_socket* tSock){
     while(fin == 0){
       bzero(envoi,50);
       bzero(buffer,50);
-		sleep(1);
-     if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+	  sleep(1);
+      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
 		
-		//si buffer[0] est different d'echap et de $
+		//si buffer[0] est different d'echap(27) et de $
 		if(buffer[0] != 27 && buffer[0] != '$'){
 		
 			printf("buffer:%s \n",buffer);
@@ -396,18 +418,20 @@ char jeu(thread_socket* tSock){
 			renvoi(envoi);
             
             if(jeuFini() == 't'){
-		    res = finJeu(tSock,"_");
-		    fin = 1;
+		        res = finJeu(tSock,"_");
+		        fin = 1;
 		    }
 
             
             
 		} else if(buffer[0] == 27){
+			printf("echap\n");
 			fin = 1;
-			strcat(envoi,"d:");
-			strcat(envoi,pseudo);
-			renvoi(envoi);
+			deconnexion(tSock);
+	     	res = 'F';
+     	    return res;
 		} else {
+		    phase_rejouer = 1;
 		    res = finJeu(tSock,buffer);
 		    fin = 1;
 		}
@@ -415,6 +439,12 @@ char jeu(thread_socket* tSock){
 		
      }else{
      	//TODO supp ce joueur et envoyer aux autre sa déco !
+     	
+				printf("deco sauvage\n");
+	    fin = 1;
+     	deconnexion(tSock);
+     	res = 'F';
+     	return res;
      }
 
 
@@ -461,40 +491,19 @@ main(int argc, char **argv) {
     void *fct_thread(void * p_data){
         int num_thread_sock = p_data;
         num_thread_sock--;
-        //printf("fct_thread-----  : %s\n",);
-
         thread_socket *thread_sock= socket_tab[num_thread_sock];
         printf("reception d'un message sur sock %d\n",thread_sock->socket );
 
 
         //------------1ere etape------------------
         //envoi des données pour que le client puisse initialiser le jeu
-		printf("initialisation debut\n");
         initialisation(thread_sock);
         //------------2e etape------------------
         // echanges avec le client.
         char tmp[256];
-		//read(thread_sock->socket,tmp,sizeof(tmp));//petit read pour annuler le write d'on ne sait pas ou
-		printf("initialisation fini\n");
 
-		//printf("%s \n",tmp);
-		//write(thread_sock->socket,tmp,sizeof(tmp));
-        while(jeu(thread_sock) == 'Y'){
-            
-            
-            
-        }
-        sleep(5);
+        while(jeu(thread_sock) == 'Y'){}
         
-        int i;
-        for(i=0; i<socket_tab_size;i++){
-          if(strcmp(thread_sock->pseudo, socket_tab[i]->pseudo)==0){
-            socket_tab[i]=socket_tab[socket_tab_size-1];
-            socket_tab_size--;
-            break;
-          }
-          
-        }
         
         close(thread_sock->socket );
         (void) p_data;
@@ -514,18 +523,7 @@ main(int argc, char **argv) {
     adresse_locale.sin_family		= ptr_hote->h_addrtype; 	/* ou AF_INET */
     adresse_locale.sin_addr.s_addr	= INADDR_ANY; 			/* ou AF_INET */
 
-    /* 2 facons de definir le service que l'on va utiliser a distance */
-    /* (commenter l'une ou l'autre des solutions) */
-
-    /*-----------------------------------------------------------*/
-    /* SOLUTION 1 : utiliser un service existant, par ex. "irc" */
-    /*
-    if ((ptr_service = getservbyname("irc","tcp")) == NULL) {
-		perror("erreur : impossible de recuperer le numero de port du service desire.");
-		exit(1);
-    }
-    adresse_locale.sin_port = htons(ptr_service->s_port);
-    */
+    
     /*-----------------------------------------------------------*/
     /* SOLUTION 2 : utiliser un nouveau numero de port */
     adresse_locale.sin_port = htons(5042);
