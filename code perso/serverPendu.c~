@@ -40,13 +40,15 @@ typedef struct thread_socket {
 
 }thread_socket;
 
+char reponses[10] = {'a','a','a','a','a','a','a','a','a','a'};
+int reponses_tab_size = 0;
 thread_socket* socket_tab[10];
 int socket_tab_size = 0;
 lettre_commun lettres;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
-
+//TODO verifier le renvoie des BONNES données quand on rejoue, en particulier les lettresFausses et mot haché"; ou est initialisé le tab de lettres fausses ?
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
@@ -56,8 +58,8 @@ void init_pseudo(thread_socket* tSock, char* buffer){
 
   char buffer_pseudo[10];
   char pseudo[12]="";
-  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)+8) <= 0){
-      write(tSock->socket,"erreur pseudo trop court",25);
+  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) < 0){
+      //TODO supp ce joueur et envoyer aux autre sa déco !
   }else{
     // creation du pseudo concaténé avec son numéro de socket
     strcpy(pseudo, buffer_pseudo);
@@ -70,7 +72,6 @@ void init_pseudo(thread_socket* tSock, char* buffer){
     char repPseudo[50] = "Votre pseudo pour le jeu sera :";
     strcat(repPseudo, pseudo);
 	  strcpy(buffer, pseudo);
-	  printf("ok\n");
 
     //write(tSock->socket,repPseudo,sizeof(repPseudo));
   }
@@ -141,7 +142,7 @@ void initialisation(thread_socket* tSock){
 	init_lettres(buffer);
 	strcat(buffer,"$");
 	printf(" buffer final : %s\n", buffer);
-	write(tSock->socket,buffer,strlen(buffer)+8);
+	write(tSock->socket,buffer,strlen(buffer)+1);
 	
 	char message[20];
 	bzero(message,20);
@@ -154,7 +155,7 @@ void initialisation(thread_socket* tSock){
         
         if(socket_tab[i]->socket != tSock->socket){
         	if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0)
-		    write(socket_tab[i]->socket,message,strlen(message)+8);
+		    write(socket_tab[i]->socket,message,strlen(message)+1);
 			//+1 evite une erreur d'envoie
 			
         }
@@ -174,7 +175,7 @@ void initialisationMot(){
 
 	piocherMot(lettres.mot);
 
-	printf(lettres.mot);
+	printf("mot:%s\n",lettres.mot);
 	int i =0;
 	while( i < 27){
 		if(checkLetter2(lettres.mot[i]) != -1){
@@ -188,7 +189,7 @@ void initialisationMot(){
 	//printf(lettres.motHache);
 }
 
-char* pendu(char lettrePropose, char res[]){
+char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 	unsigned int i;
 	int trouver = 0;
 	for(i = 0; i < strlen(lettres.mot); i++)
@@ -197,7 +198,9 @@ char* pendu(char lettrePropose, char res[]){
 		{
 			lettres.motHache[i] = lettres.mot[i];
 			trouver = 1;
+			tSock->points++;
 		}
+		
 	}
 	if(trouver == 0){
 		for(i = 0; i < 26; i++) {
@@ -216,6 +219,7 @@ char* pendu(char lettrePropose, char res[]){
 				res [1] = ':';
 				res [2] = lettrePropose;
 				res [3] = '\0';
+			    tSock->points--;
 
 			}
 
@@ -228,6 +232,23 @@ char* pendu(char lettrePropose, char res[]){
 		res [3] = ',';
 		res [4] = '\0';
 		strcat(res,lettres.motHache);
+		
+		int flag = 1;
+		
+		//on regarde si le mot a ete trouver
+		for(i = 0; i < strlen(lettres.mot); i++)
+	    {
+		    if(lettres.mot[i] != lettres.motHache[i])
+		    {
+			    flag = 0;
+		    }
+		
+	    }
+	    //si oui on lui ajoute 10 point
+	    if(flag == 1){
+	        tSock->points = tSock->points + 10;
+	    }
+		
 	}
 
 
@@ -241,25 +262,81 @@ char* pendu(char lettrePropose, char res[]){
 //envoie a tout les clients des données
 void renvoi(char* message){
 
+        printf("envoi:%s\n",message);
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
 
-			write(socket_tab[i]->socket,message,strlen(message)+8);
+			if(write(socket_tab[i]->socket,message,strlen(message)+1)<0){
+				//TODO supp ce joueur et envoyer aux autre sa déco !
+			}
 		
 	}
 }
 
 
-char finJeu(thread_socket* tSock){
+char finJeu(thread_socket* tSock, char buff[]){
+
+
     char buffer[50];
     char res = 'F';
-    
-    if(read(tSock->socket, buffer, sizeof(buffer)+8) > 0){
-        if (buffer[1] == 'Y'){
-            res ='Y';
+    int nbJoueur = socket_tab_size;
+    //printf("nbJoueur:%d \n",nbJoueur);
+    //on réinitialises les lettres fausses
+    strcpy(lettres.lettre_trouve_fausse, "");
+    if(buff[0] != '$'){
+
+        if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+	        printf("buff1:%s \n",buffer);
+            if (buffer[1] == 'Y'){
+                res ='Y';
+            }
+        }else{
+        	//TODO supp ce joueur et envoyer aux autre sa déco !
         }
     }
+    else {
+		res = buff[1];
+		printf("buff2:%s \n",buff);
+	}
     
+    reponses[reponses_tab_size] = res;
+    reponses_tab_size ++;
+    int i = 0;
+    int flag = 1;
+    for(i; i < nbJoueur; i++){
+        printf("reponses[%d]: %c \n",i,reponses[i]);
+        if(reponses[i] =='Y' ){}
+		else{
+			if(reponses[i]=='F'){}
+			else{flag = 0;}
+        }
+    }
+	//quand tout le monde a rendu la reponse
+    if(flag == 1){
+        //donnees:motHache$others:j1,pts;j2,pts;.
+        char tmp[50] = "donnees:";
+        initialisationMot();
+        strcat(tmp,lettres.motHache);
+        strcat(tmp,"$others:");
+        i = 0;
+        for(i; i < socket_tab_size; ++i){
+            strcat(tmp,socket_tab[i]->pseudo);
+            strcat(tmp,",");
+			char str[5];
+			sprintf(str,"%d",tSock->points);
+            strcat(tmp,str);
+            strcat(tmp,";");
+        }
+        strcat(tmp,".");
+        renvoi(tmp);
+		
+		for(i = 0; i < nbJoueur; i++){
+			reponses[i] = 'a';
+		}
+		reponses_tab_size = 0;
+    
+        
+    }
     return res;
 
 }
@@ -269,6 +346,13 @@ char jeuFini(){
     char res = 'f';
     if(lettres.lettre_trouve_fausse[9] >= 'A' && lettres.lettre_trouve_fausse[9] <= 'Z'){
         res = 't';
+        
+        //on enleve 3 points a tous les joueurs
+        int i = 0;
+        for(i; i < socket_tab_size; ++i){
+            socket_tab[i]->points -= 3;
+        }
+        
         return res;
     }
     res = 't';
@@ -297,32 +381,40 @@ char jeu(thread_socket* tSock){
       bzero(envoi,50);
       bzero(buffer,50);
 		sleep(1);
-     if(read(tSock->socket, buffer, sizeof(buffer)+8) > 0){
-		if(buffer[0] != 27){
-			printf("buff:%s \n",buffer);
+     if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+		
+		//si buffer[0] est different d'echap et de $
+		if(buffer[0] != 27 && buffer[0] != '$'){
+		
+			printf("buffer:%s \n",buffer);
 			char tmp[50];
-			pendu(buffer[0],tmp);
-			printf("tmp:%s \n",tmp);
+			pendu(buffer[0],tmp,tSock);
 			strcat(envoi,tmp);
 			strcat(envoi,pseudo);
 			strcat(envoi,".");
 
 			renvoi(envoi);
-            printf("envoie:%s \n",envoi);
+            
+            if(jeuFini() == 't'){
+		    res = finJeu(tSock,"_");
+		    fin = 1;
+		    }
+
             
             
-		} else {
+		} else if(buffer[0] == 27){
 			fin = 1;
 			strcat(envoi,"d:");
 			strcat(envoi,pseudo);
 			renvoi(envoi);
-		}
-		
-		if(jeuFini() == 't'){
-		    res = finJeu(tSock);
+		} else {
+		    res = finJeu(tSock,buffer);
 		    fin = 1;
 		}
-
+		
+		
+     }else{
+     	//TODO supp ce joueur et envoyer aux autre sa déco !
      }
 
 
@@ -388,7 +480,7 @@ main(int argc, char **argv) {
 		//printf("%s \n",tmp);
 		//write(thread_sock->socket,tmp,sizeof(tmp));
         while(jeu(thread_sock) == 'Y'){
-            initialisationMot();
+            
             
             
         }

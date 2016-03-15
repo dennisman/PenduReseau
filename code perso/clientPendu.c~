@@ -203,14 +203,13 @@ int main(int argc, char **argv) {
     ligne_init++;
     if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
-      log("pseudo envoyé:", pseudo);
-
     }
+    log("**CLIENT pseudo envoyé:", pseudo);
   }
 
   void demandeJoueurs(char buffer2[]){
     mvprintw(ligne_init, 0, "Reception des données des autres joueurs...");
-    log("joueurs recu:", buffer2);
+    log("**CLIENT joueurs recus:", buffer2);
     ligne_init++;
     char * joueur_i;
     char * joueur_points;
@@ -259,7 +258,7 @@ int main(int argc, char **argv) {
   }
   void demandeLettres(char buff_lettres[]){
     mvprintw(ligne_init, 0, "Reception des infos de jeu...");
-
+	log("**CLIENT bug_lettres:", buff_lettres);
     ligne_init++;
     if(buff_lettres[0]!='l' || buff_lettres[15]!=':'){
       err("erreur lettres: Veuilliez compiler avec -g pour eviter de mauvaises optimisations de compilation");
@@ -299,6 +298,7 @@ int main(int argc, char **argv) {
     for(i=0; i<nbJoueurs;i++){
       if(strcmp(nomJ, tabJoueurs[i]->nom)==0){
         trouve=1;
+        log("**CLIENT suppJoueur:", nomJ);
       }
       if(trouve==1 && i<nbJoueurs-1){
         strcpy(tabJoueurs[i]->nom,tabJoueurs[i+1]->nom);
@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
       envoi[1]=scannedChar;
       envoi[2]='\0';
       write(socket_descriptor, envoi, strlen(envoi)+1);
-      log("envoi:",envoi);
+      log("**CLIENT envoi findeJeu:",envoi);
       //*5
       bzero(envoi,300);
       /*le serveur a attendu que tout les clients repondent
@@ -365,6 +365,7 @@ int main(int argc, char **argv) {
       */
       read(socket_descriptor, envoi, sizeof(envoi));
       //*6
+      log("**CLIENT recu findeJeu:",envoi);
       char copie[200];
       strcpy(copie, strchr(envoi,':')+1);
       strcpy(word , strtok(copie,"$"));
@@ -521,7 +522,7 @@ int main(int argc, char **argv) {
       //printf("mess recu :%s---\n",recu);
       char typeMsg = recu[0];
       if (recu[1]!=':'){
-        printf("erreur de reception\n");
+        log("**CLIENT erreur de reception:",recu);
         break;
       }
       char copie[50];
@@ -750,6 +751,9 @@ int main(int argc, char **argv) {
       scannedInt=wgetch(winHangman);
       scannedChar = toupper(scannedInt);
       //nodelay(winHangman, 0);
+      char logchar[2];
+      logchar[0]=scannedChar;
+      log("**CLIENT scannedChar :",logchar);
     if(finished==0){
       if(scannedChar >= 'A' && scannedChar <= 'Z'){
         if(checkLetter(scannedChar, letters) == -1 ){

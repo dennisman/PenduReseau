@@ -48,7 +48,7 @@ lettre_commun lettres;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
 
-
+//TODO verifier le renvoie des BONNES données quand on rejoue, en particulier les lettresFausses et mot haché"; ou est initialisé le tab de lettres fausses ?
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
@@ -58,8 +58,8 @@ void init_pseudo(thread_socket* tSock, char* buffer){
 
   char buffer_pseudo[10];
   char pseudo[12]="";
-  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) <= 0){
-      write(tSock->socket,"erreur pseudo trop court",25);
+  if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) < 0){
+      //TODO supp ce joueur et envoyer aux autre sa déco !
   }else{
     // creation du pseudo concaténé avec son numéro de socket
     strcpy(pseudo, buffer_pseudo);
@@ -266,7 +266,9 @@ void renvoi(char* message){
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
 
-			write(socket_tab[i]->socket,message,strlen(message)+1);
+			if(write(socket_tab[i]->socket,message,strlen(message)+1)<0){
+				//TODO supp ce joueur et envoyer aux autre sa déco !
+			}
 		
 	}
 }
@@ -288,6 +290,8 @@ char finJeu(thread_socket* tSock, char buff[]){
             if (buffer[1] == 'Y'){
                 res ='Y';
             }
+        }else{
+        	//TODO supp ce joueur et envoyer aux autre sa déco !
         }
     }
     else {
@@ -409,6 +413,8 @@ char jeu(thread_socket* tSock){
 		}
 		
 		
+     }else{
+     	//TODO supp ce joueur et envoyer aux autre sa déco !
      }
 
 
