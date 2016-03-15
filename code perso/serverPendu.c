@@ -10,7 +10,7 @@ Serveur à lancer avant le client
 #include <string.h> 		/* pour bcopy, ... */
 #include <pthread.h>
 #include <ctype.h>
-
+#include "log.c"
 #include "../Pendu/dico.c"
 #include "Letters.c"
 
@@ -73,8 +73,6 @@ void deconnexion(thread_socket* thread_sock){
         strcat(envoi,"d:");
         strcat(envoi,pseudo);
         renvoi(envoi);
-        printf("envoie deco %d \n",i);
-        ++i;
     }
         
 }
@@ -172,7 +170,7 @@ void initialisation(thread_socket* tSock){
     for(i; i < socket_tab_size; i++){
         
         if(socket_tab[i]->socket != tSock->socket){
-        	if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0)
+        	if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0 && phase_rejouer == 0)
 	        write(socket_tab[i]->socket,message,strlen(message)+1);
 		    //+1 evite une erreur d'envoie
 		
@@ -285,45 +283,42 @@ void renvoi(char* message){
         printf("envoi:%s\n",message);
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
-
-			if(write(socket_tab[i]->socket,message,strlen(message)+1)<0){
-				//TODO supp ce joueur et envoyer aux autre sa déco !
-				printf("renoie\n");
-				deconnexion(socket_tab[i]);
+            if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0){
+			    if(write(socket_tab[i]->socket,message,strlen(message)+1)<0){
+				    //TODO supp ce joueur et envoyer aux autre sa déco !
+				    printf("renoie\n");
+				    deconnexion(socket_tab[i]);
+			    }
 			}
 		
 	}
 }
 
 
-char finJeu(thread_socket* tSock, char buff[]){
+char finJeu(thread_socket* tSock, char buff[], int nbJoueur){
 
 
     char buffer[50];
     char res = 'N';
-    int nbJoueur = socket_tab_size;
-    //on réinitialises les lettres fausses
     if(buff[0] != '$'){
 
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
 	        printf("buff1:%s \n",buffer);
             if (buffer[1] == 'Y'){
                 res ='Y';
-            } else {
-                printf("envoi N\n");
-                deconnexion(tSock);
-            }
+            } 
         }else{
         	//TODO supp ce joueur et envoyer aux autre sa déco !
 				printf("finjeu\n");
         	deconnexion(tSock);
-        	return res;
+        	
         }
-    }
-    else {
+    } else {
 		res = buff[1];
 		printf("buff2:%s \n",buff);
 	}
+	
+	if(res != 'Y'){deconnexion(tSock);}
     
     reponses[reponses_tab_size] = res;
     reponses_tab_size ++;
@@ -395,63 +390,64 @@ char jeuFini(){
 
 char jeu(thread_socket* tSock){
     char res = 'F';
-	char buffer[50];
+    char buffer[50];
 
-	char envoi[50];
+    char envoi[50];
 
-	strcpy(envoi,"");
-	char * pseudo = tSock->pseudo ;
-	int fin = 0;
+    strcpy(envoi,"");
+    char * pseudo = tSock->pseudo ;
+    int fin = 0;
     while(fin == 0){
-      bzero(envoi,50);
-      bzero(buffer,50);
-	  sleep(1);
-      if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
-		
-		//si buffer[0] est different d'echap(27) et de $
-		if(buffer[0] != 27 && buffer[0] != '$'){
-		
-			printf("buffer:%s \n",buffer);
-			char tmp[50];
-			pendu(buffer[0],tmp,tSock);
-			strcat(envoi,tmp);
-			strcat(envoi,pseudo);
-			strcat(envoi,".");
+        bzero(envoi,50);
+        bzero(buffer,50);
+        sleep(1);
+        if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
+           
+            //si buffer[0] est different d'echap(27) et de $ et qu'on est pas dans la phase rejouer
+            if(buffer[0] != 27 && buffer[0] != '$' && phase_rejouer == 0){
 
-			renvoi(envoi);
+                    printf("buffer:%s \n",buffer);
+                    char tmp[50];
+                    pendu(buffer[0],tmp,tSock);
+                    strcat(envoi,tmp);
+                    strcat(envoi,pseudo);
+                    strcat(envoi,".");
+
+                    renvoi(envoi);
+
+                    if(jeuFini() == 't'){
+                        phase_rejouer = 1;
+                        res = finJeu(tSock,"_",socket_tab_size);
+                        fin = 1;
+                    }
+
+
+
+                } else if(buffer[0] == 27){
+                    printf("echap\n");
+                    fin = 1;
+                    deconnexion(tSock);
+                    res = 'F';
+                    return res;
+                } else {
+                    phase_rejouer = 1;
+                    res = finJeu(tSock,buffer,socket_tab_size);
+                    fin = 1;
+                }
+
             
-            if(jeuFini() == 't'){
-		        res = finJeu(tSock,"_");
-		        fin = 1;
-		    }
+            }else{
+                //TODO supp ce joueur et envoyer aux autre sa déco !
 
-            
-            
-		} else if(buffer[0] == 27){
-			printf("echap\n");
-			fin = 1;
-			deconnexion(tSock);
-	     	res = 'F';
-     	    return res;
-		} else {
-		    phase_rejouer = 1;
-		    res = finJeu(tSock,buffer);
-		    fin = 1;
-		}
-		
-		
-     }else{
-     	//TODO supp ce joueur et envoyer aux autre sa déco !
-     	
-				printf("deco sauvage\n");
-	    fin = 1;
-     	deconnexion(tSock);
-     	res = 'F';
-     	return res;
-     }
-
-
+                    printf("deco sauvage\n");
+                fin = 1;
+                deconnexion(tSock);
+                res = 'F';
+                return res;
+            }
     }
+
+    
     
     return res;
 
@@ -579,12 +575,14 @@ main(int argc, char **argv) {
 			longueur_adresse_courante = sizeof(adresse_client_courant);
 			/* adresse_client_courant sera renseigné par accept via les infos du connect */
 			thread_socket *nouv_socket = malloc(sizeof(thread_socket));
-
+               
 			if ((nouv_socket->socket= accept(socket_descriptor,(sockaddr*)(&adresse_client_courant),&longueur_adresse_courante))< 0) {
 				perror("erreur : impossible d'accepter la connexion avec le client.");
 				exit(1);
 			}
+			////
 			socket_tab[socket_tab_size] = nouv_socket;
+			///
 			socket_tab[socket_tab_size]->pseudo= malloc(15*sizeof(char));
 			strcpy(socket_tab[socket_tab_size]->pseudo, "NoPseudoYet");
 			socket_tab[socket_tab_size]->points=10;
