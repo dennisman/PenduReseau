@@ -15,7 +15,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <errno.h>
 #include "Letters.c"
 #include "DrawHangman.c"
-
+#include "log.c"
 #define HANGMAN_HEIGHT 12
 #define HANGMAN_WIDTH 20
 
@@ -203,12 +203,14 @@ int main(int argc, char **argv) {
     ligne_init++;
     if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
+      log("pseudo envoyé:", pseudo);
 
     }
   }
 
   void demandeJoueurs(char buffer2[]){
     mvprintw(ligne_init, 0, "Reception des données des autres joueurs...");
+    log("joueurs recu:", buffer2);
     ligne_init++;
     char * joueur_i;
     char * joueur_points;
@@ -277,7 +279,7 @@ int main(int argc, char **argv) {
     ligne_init++;
 	
 	strcpy(copie,lettresFausses);
-    strcpy(lettresFausses,strchr(lettresFausses, ':')+1);
+    strcpy(copie,strchr(lettresFausses, ':')+1);
     strcpy(lettresFausses, copie);
 
     int ind_let_i=0;
@@ -305,7 +307,38 @@ int main(int argc, char **argv) {
     }
     nbJoueurs--;
   }
-
+  void aff_hangman(){
+    werase(winHangman);
+    readHangman(hangman, ((lives-10)*-1));
+    printHangman(winHangman, 1, 2, hangman);
+    box(winHangman, ACS_VLINE, ACS_HLINE);
+    wrefresh(winHangman);
+  }
+  void aff_word(){
+    werase(winWord);
+    mvwprintw(winWord, 0, 0, "%s", word);
+    wrefresh(winWord);
+    //si le mot est rempli, fin du jeu appelé par la fonction addPointsWin
+  }
+  void aff_scores(){
+    werase(winOthers);
+    wresize(winOthers,nbJoueurs+2,17);
+    wrefresh(winOthers);
+    int i;
+    char nomJ[15];
+    for(i=0; i<nbJoueurs;i++){
+      strcpy(nomJ, tabJoueurs[i]->nom);
+      if(strcmp(nomJ, pseudo)==0){
+        wcolor_set(winOthers,GREEN_B,NULL);
+        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
+        wcolor_set(winOthers,WHITE_B,NULL);
+      }else{
+        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
+      }
+    }
+    box(winOthers, ACS_VLINE, ACS_HLINE);
+    wrefresh(winOthers);
+  }
 
   void finDuJeu(){
     //*3
@@ -323,7 +356,7 @@ int main(int argc, char **argv) {
       envoi[1]=scannedChar;
       envoi[2]='\0';
       write(socket_descriptor, envoi, strlen(envoi)+1);
-      printf("envoi %s\n",envoi);
+      log("envoi:",envoi);
       //*5
       bzero(envoi,300);
       /*le serveur a attendu que tout les clients repondent
@@ -333,7 +366,6 @@ int main(int argc, char **argv) {
       read(socket_descriptor, envoi, sizeof(envoi));
       //*6
       char copie[200];
-      printf("%s\n", envoi);
       strcpy(copie, strchr(envoi,':')+1);
       strcpy(word , strtok(copie,"$"));
       //surement des erreurs par la, tests a faire
@@ -341,7 +373,18 @@ int main(int argc, char **argv) {
       nbJoueurs =0;
       demandeJoueurs(envoi);
       //*7
-      //finished = 0
+      finished = 0;
+
+      lives = 10;
+      aff_word();
+      aff_hangman();
+      aff_scores();
+      for(i=0;i<27;i++){
+    	letters[i]=' ';
+  	}
+  	werase(winLetters);
+    mvwprintw(winLetters, 0, 0, "%s", letters);
+    wrefresh(winLetters);
 
 
       /*
@@ -396,25 +439,7 @@ int main(int argc, char **argv) {
     finDuJeu();
   }
 
-  void aff_scores(){
-    werase(winOthers);
-    wresize(winOthers,nbJoueurs+2,17);
-    wrefresh(winOthers);
-    int i;
-    char nomJ[15];
-    for(i=0; i<nbJoueurs;i++){
-      strcpy(nomJ, tabJoueurs[i]->nom);
-      if(strcmp(nomJ, pseudo)==0){
-        wcolor_set(winOthers,GREEN_B,NULL);
-        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
-        wcolor_set(winOthers,WHITE_B,NULL);
-      }else{
-        mvwprintw(winOthers,i+1,1, "%s: %s",nomJ, tabJoueurs[i]->points);
-      }
-    }
-    box(winOthers, ACS_VLINE, ACS_HLINE);
-    wrefresh(winOthers);
-  }
+  
   void addPointWin(char * nomJ, char lettre){
     int i;
     int j;
@@ -479,19 +504,7 @@ int main(int argc, char **argv) {
   }
 
 
-  void aff_hangman(){
-    werase(winHangman);
-    readHangman(hangman, ((lives-10)*-1));
-    printHangman(winHangman, 1, 2, hangman);
-    box(winHangman, ACS_VLINE, ACS_HLINE);
-    wrefresh(winHangman);
-  }
-  void aff_word(){
-    werase(winWord);
-    mvwprintw(winWord, 0, 0, "%s", word);
-    wrefresh(winWord);
-    //si le mot est rempli, fin du jeu appelé par la fonction addPointsWin
-  }
+  
 
   void *threadOthers(){
 
@@ -706,7 +719,7 @@ int main(int argc, char **argv) {
   noecho();
   curs_set(0);
   winHangman = newwin(HANGMAN_HEIGHT + 4, HANGMAN_WIDTH + 4, 0, cols - 24);
-  winWord = newwin(1, strlen(word), rows/2, (cols-strlen(word))/2);
+  winWord = newwin(1, strlen(word)+10, rows/2, (cols-strlen(word))/2);
   winLives = newwin(1, 10, HANGMAN_HEIGHT + 2, cols - 11);
   winLetters = newwin(1, 26, 0, 0);
   winOthers = newwin(nbJoueurs+2,17,3,1);

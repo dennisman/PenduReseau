@@ -15,7 +15,7 @@ client <adresse-serveur> <message-a-transmettre>
 #include <errno.h>
 #include "Letters.c"
 #include "DrawHangman.c"
-
+#include "log.c"
 #define HANGMAN_HEIGHT 12
 #define HANGMAN_WIDTH 20
 
@@ -203,12 +203,13 @@ int main(int argc, char **argv) {
     ligne_init++;
     if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
-
     }
+    log("pseudo envoyé:", pseudo);
   }
 
   void demandeJoueurs(char buffer2[]){
     mvprintw(ligne_init, 0, "Reception des données des autres joueurs...");
+    log("joueurs recu:", buffer2);
     ligne_init++;
     char * joueur_i;
     char * joueur_points;
@@ -354,7 +355,7 @@ int main(int argc, char **argv) {
       envoi[1]=scannedChar;
       envoi[2]='\0';
       write(socket_descriptor, envoi, strlen(envoi)+1);
-      //printf("envoi %s\n",envoi);
+      log("envoi:",envoi);
       //*5
       bzero(envoi,300);
       /*le serveur a attendu que tout les clients repondent
