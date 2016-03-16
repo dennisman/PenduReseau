@@ -191,6 +191,7 @@ int main(int argc, char **argv) {
         refresh();
       }
     }while(taille_pseudo < 1|| taille_pseudo>10);
+    printf("ok0\n");
     clear();
     refresh();
     strcpy(msg,"Initialisation des données, echange avec le serveur :");
@@ -199,12 +200,14 @@ int main(int argc, char **argv) {
     ligne_init++;
     ligne_init++;
     color_set(WHITE_B, NULL);
-    mvprintw(ligne_init, 0, "Envoie de votre pseudo (%s) au serveur ...", pseudo);
+    mvprintw(ligne_init, 0, "Envoie de votre pseudo (%s) ... trop de clients, patientez", pseudo);
     ligne_init++;
     if ((write(socket_descriptor, pseudo, strlen(pseudo)+1)) < 0) {
       err("erreur : impossible d'ecrire le message destine au serveur.");
     }
     log("**CLIENT pseudo envoyé:", pseudo);
+     refresh();
+    
   }
 
   void demandeJoueurs(char buffer2[]){
@@ -323,7 +326,7 @@ int main(int argc, char **argv) {
   void aff_scores(){
     werase(winOthers);
     wresize(winOthers,nbJoueurs+2,17);
-    wrefresh(winOthers);
+    //wrefresh(winOthers);
     int i;
     char nomJ[15];
     for(i=0; i<nbJoueurs;i++){
@@ -338,6 +341,7 @@ int main(int argc, char **argv) {
     }
     box(winOthers, ACS_VLINE, ACS_HLINE);
     wrefresh(winOthers);
+    
   }
 
   void finDuJeu(){
@@ -406,10 +410,8 @@ int main(int argc, char **argv) {
       */
       ;
     }else{
-      char c=27;
-      char mess[10];
-      mess[0]=c;
-      write(socket_descriptor, mess, 2);
+      char mess[10]="$N";
+      write(socket_descriptor, mess, 3);
       closeExit();
     }
 
@@ -639,7 +641,6 @@ int main(int argc, char **argv) {
 
 
     demandePseudo();
-
     if(read(socket_descriptor, grandBuf, sizeof(grandBuf))<1){
       printf("error\n");
     }

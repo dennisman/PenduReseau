@@ -575,7 +575,7 @@ main(int argc, char **argv) {
 			longueur_adresse_courante = sizeof(adresse_client_courant);
 			/* adresse_client_courant sera renseigné par accept via les infos du connect */
 			thread_socket *nouv_socket = malloc(sizeof(thread_socket));
-               
+            while(socket_tab_size>9); 
 			if ((nouv_socket->socket= accept(socket_descriptor,(sockaddr*)(&adresse_client_courant),&longueur_adresse_courante))< 0) {
 				perror("erreur : impossible d'accepter la connexion avec le client.");
 				exit(1);
