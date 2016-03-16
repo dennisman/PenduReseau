@@ -148,18 +148,20 @@ void initialisation(thread_socket* tSock){
     tSock->points = 10;
     char buffer[500]="";
     char dollar[1] = "$";
+    while(socket_tab_size<2);
     init_pseudo(tSock, buffer);
     strcat(buffer,"$");
     //ETAPE 2: envoie des données des autres utilisateurs
     //pour chaque personne dans le tableau de socket, on envoie
     //son pseudo et ses points
+    
+    
     init_others(buffer);
     strcat(buffer,"$");
     init_lettres(buffer);
     strcat(buffer,"$");
     printf(" buffer final : %s\n", buffer);
     write(tSock->socket,buffer,strlen(buffer)+1);
-
     char message[20];
     bzero(message,20);
     strcpy(message,"c:");

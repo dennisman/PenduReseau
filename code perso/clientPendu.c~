@@ -752,6 +752,24 @@ int main(int argc, char **argv) {
   int scannedInt=0;
   char oldScannedChar = 0;
   char mess2serv[10];
+  int go = 1;
+  while(1){
+  // thread while(getch());
+  	go=1;
+	  if(nbJoueurs>=2){
+	  	for(i=0;i<nbJoueurs;i++){
+		      if(strcmp(tabJoueurs[i]->nom,"NoPseudoYet")==0){
+		      	go =0;
+	  			}
+	  	}
+	  }
+	  if(go==1){
+	  	//kill thread getch();
+	  	sleep(3);
+	  	break;
+	  }
+  }
+  
   while(1){
     
       //nodelay(winHangman, 1);
