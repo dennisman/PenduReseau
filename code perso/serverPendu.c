@@ -342,8 +342,8 @@ char finJeu(thread_socket* tSock, char buff[], int nbJoueur){
             strcat(tmp,socket_tab[i]->pseudo);
             strcat(tmp,",");
 			char str[5];
-			sprintf(str,"%d",tSock->points);
-			printf("point: %d \n",tSock->points);
+			sprintf(str,"%d",socket_tab[i]->points);
+			printf("point: %d \n",socket_tab[i]->points);
             strcat(tmp,str);
             strcat(tmp,";");
         }
