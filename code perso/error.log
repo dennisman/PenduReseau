@@ -581,3 +581,175 @@
 17H:50M:31S : **CLIENT pseudo envoyé: theo
 17H:50M:31S : **CLIENT joueurs recus: others:dennis4,10;theo5,10;.
 17H:50M:31S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+20H:22M:22S : **CLIENT pseudo envoyé: azer
+20H:22M:25S : **CLIENT joueurs recus: others:azer4,10;NoPseudoYet,10;.
+20H:22M:25S : **CLIENT bug_lettres: lettresTrouvees:_______.lettresFausses:.
+20H:22M:27S : **CLIENT pseudo envoyé: zr
+20H:22M:27S : **CLIENT joueurs recus: others:azer4,10;zr5,10;.
+20H:22M:27S : **CLIENT bug_lettres: lettresTrouvees:_______.lettresFausses:.
+20H:25M:30S : **CLIENT scannedChar : A
+20H:25M:34S : **CLIENT scannedChar : V
+20H:25M:35S : **CLIENT scannedChar : O
+20H:25M:36S : **CLIENT scannedChar : U
+20H:25M:36S : **CLIENT scannedChar : L
+20H:25M:37S : **CLIENT scannedChar : I
+20H:25M:38S : **CLIENT scannedChar : R
+20H:25M:41S : **CLIENT envoi findeJeu: $Y
+20H:25M:44S : **CLIENT scannedChar : N
+20H:25M:45S : **CLIENT recu findeJeu: donnees:___$others:azer4,23;.
+20H:25M:45S : **CLIENT joueurs recus: others:azer4,23;.
+20H:31M:58S : **CLIENT pseudo envoyé: eqstr
+20H:31M:58S : **CLIENT joueurs recus: others:azer4,23;eqstr6,10;.
+20H:31M:58S : **CLIENT bug_lettres: lettresTrouvees:___.lettresFausses:.
+20H:32M:5S : **CLIENT scannedChar : 
+20H:32M:5S : **CLIENT suppJoueur: eqstr6
+20H:32M:7S : **CLIENT scannedChar : A
+20H:32M:8S : **CLIENT scannedChar : Z
+20H:32M:11S : **CLIENT scannedChar : E
+20H:32M:15S : **CLIENT scannedChar : T
+20H:32M:17S : **CLIENT scannedChar : L
+20H:32M:18S : **CLIENT scannedChar : M
+20H:32M:19S : **CLIENT scannedChar : N
+20H:32M:20S : **CLIENT scannedChar : H
+20H:32M:24S : **CLIENT scannedChar : F
+20H:32M:28S : **CLIENT scannedChar : D
+20H:32M:32S : **CLIENT scannedChar : S
+20H:32M:34S : **CLIENT envoi findeJeu: $Y
+20H:32M:34S : **CLIENT recu findeJeu: donnees:_____$others:azer4,11;.
+20H:32M:34S : **CLIENT joueurs recus: others:azer4,11;.
+22H:28M:49S : **CLIENT pseudo envoyé: ezrt
+22H:28M:55S : **CLIENT joueurs recus: others:ezrt4,10;NoPseudoYet,10;.
+22H:28M:55S : **CLIENT bug_lettres: lettresTrouvees:_______.lettresFausses:.
+22H:28M:56S : **CLIENT pseudo envoyé: df
+22H:28M:56S : **CLIENT joueurs recus: others:ezrt4,10;df5,10;.
+22H:28M:56S : **CLIENT bug_lettres: lettresTrouvees:_______.lettresFausses:.
+22H:29M:0S : **CLIENT scannedChar : F
+22H:29M:1S : **CLIENT scannedChar : A
+22H:29M:2S : **CLIENT scannedChar : G
+22H:29M:2S : **CLIENT scannedChar : T
+22H:29M:3S : **CLIENT scannedChar : J
+22H:29M:4S : **CLIENT scannedChar : K
+22H:29M:5S : **CLIENT scannedChar : I
+22H:29M:6S : **CLIENT scannedChar : U
+22H:29M:6S : **CLIENT scannedChar : E
+22H:29M:8S : **CLIENT envoi findeJeu: $Y
+22H:29M:9S : **CLIENT envoi findeJeu: $Y
+22H:29M:9S : **CLIENT recu findeJeu: donnees:_______$others:ezrt4,11;df5,24;.
+22H:29M:9S : **CLIENT recu findeJeu: donnees:_______$others:ezrt4,11;df5,24;.
+22H:29M:9S : **CLIENT joueurs recus: others:ezrt4,11;df5,24;.
+22H:29M:9S : **CLIENT joueurs recus: others:ezrt4,11;df5,24;.
+22H:29M:15S : **CLIENT scannedChar : P
+22H:29M:16S : **CLIENT scannedChar : A
+22H:29M:17S : **CLIENT scannedChar : R
+22H:29M:18S : **CLIENT scannedChar : K
+22H:29M:18S : **CLIENT scannedChar : G
+22H:29M:19S : **CLIENT scannedChar : I
+22H:29M:20S : **CLIENT scannedChar : N
+22H:29M:21S : **CLIENT scannedChar : N
+22H:29M:25S : **CLIENT envoi findeJeu: $Y
+22H:29M:25S : **CLIENT recu findeJeu: donnees:________$others:df5,40;.
+22H:29M:25S : **CLIENT joueurs recus: others:df5,40;.
+22H:29M:45S : **CLIENT scannedChar : N
+22H:29M:47S : **CLIENT pseudo envoyé: azer
+22H:29M:47S : **CLIENT joueurs recus: others:df5,41;azer6,10;.
+22H:29M:47S : **CLIENT bug_lettres: lettresTrouvees:____N___.lettresFausses:.
+22H:29M:52S : **CLIENT scannedChar : M
+22H:29M:53S : **CLIENT scannedChar : E
+22H:29M:54S : **CLIENT scannedChar : A
+22H:29M:54S : **CLIENT scannedChar : L
+22H:29M:55S : **CLIENT scannedChar : N
+22H:29M:55S : **CLIENT scannedChar : G
+22H:29M:56S : **CLIENT scannedChar : R
+22H:30M:1S : **CLIENT scannedChar : Y
+22H:30M:2S : **CLIENT envoi findeJeu: $Y
+22H:30M:2S : **CLIENT recu findeJeu: donnees:____$others:df5,43;.
+22H:30M:2S : **CLIENT joueurs recus: others:df5,43;.
+22H:35M:35S : **CLIENT pseudo envoyé: u
+22H:35M:35S : **CLIENT joueurs recus: others:df5,43;u4,10;.
+22H:35M:35S : **CLIENT bug_lettres: lettresTrouvees:____.lettresFausses:.
+22H:35M:39S : **CLIENT scannedChar : S
+22H:35M:40S : **CLIENT scannedChar : A
+22H:35M:41S : **CLIENT scannedChar : L
+22H:35M:42S : **CLIENT scannedChar : E
+22H:35M:56S : **CLIENT scannedChar : Y
+22H:35M:57S : **CLIENT envoi findeJeu: $Y
+22H:35M:57S : **CLIENT recu findeJeu: donnees:__________$others:df5,43;.
+22H:35M:57S : **CLIENT joueurs recus: others:df5,43;.
+22H:35M:57S : **CLIENT erreur de reception: donnees:_____$others:df5,43;.
+22H:37M:48S : **CLIENT pseudo envoyé: uhi
+22H:37M:49S : **CLIENT joueurs recus: others:uhi4,10;NoPseudoYet,10;.
+22H:37M:49S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+22H:37M:50S : **CLIENT pseudo envoyé: o
+22H:37M:50S : **CLIENT joueurs recus: others:uhi4,10;o5,10;.
+22H:37M:50S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+22H:37M:51S : **CLIENT pseudo envoyé: edr
+22H:37M:51S : **CLIENT joueurs recus: others:edr6,10;.
+22H:37M:51S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+22H:38M:0S : **CLIENT pseudo envoyé: yui
+22H:38M:0S : **CLIENT joueurs recus: others:edr6,10;yui4,10;.
+22H:38M:0S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+22H:38M:5S : **CLIENT pseudo envoyé: iu
+22H:38M:5S : **CLIENT joueurs recus: others:edr6,10;yui4,10;iu5,10;.
+22H:38M:5S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+22H:38M:11S : **CLIENT scannedChar : R
+22H:38M:12S : **CLIENT scannedChar : O
+22H:38M:13S : **CLIENT scannedChar : U
+22H:38M:14S : **CLIENT scannedChar : L
+22H:38M:15S : **CLIENT scannedChar : E
+22H:38M:20S : **CLIENT scannedChar : Y
+22H:38M:20S : **CLIENT envoi findeJeu: $Y
+22H:38M:20S : **CLIENT recu findeJeu: donnees:_____$others:edr6,10;yui4,10;.
+22H:38M:20S : **CLIENT joueurs recus: others:edr6,10;yui4,10;.
+22H:38M:23S : **CLIENT scannedChar : Y
+22H:38M:24S : **CLIENT envoi findeJeu: $Y
+22H:38M:24S : **CLIENT recu findeJeu: donnees:_____$others:edr6,10;yui4,10;.
+22H:38M:24S : **CLIENT joueurs recus: others:edr6,10;yui4,10;.
+22H:40M:35S : **CLIENT scannedChar : 
+22H:40M:36S : **CLIENT scannedChar : 
+22H:40M:47S : **CLIENT pseudo envoyé: gyi
+22H:40M:48S : **CLIENT joueurs recus: others:gyi4,10;NoPseudoYet,10;.
+22H:40M:48S : **CLIENT bug_lettres: lettresTrouvees:_________.lettresFausses:.
+22H:40M:50S : **CLIENT pseudo envoyé: g
+22H:40M:50S : **CLIENT joueurs recus: others:gyi4,10;g5,10;.
+22H:40M:50S : **CLIENT bug_lettres: lettresTrouvees:_________.lettresFausses:.
+22H:40M:52S : **CLIENT pseudo envoyé: ed
+22H:40M:52S : **CLIENT joueurs recus: others:gyi4,10;g5,10;ed6,10;.
+22H:40M:52S : **CLIENT bug_lettres: lettresTrouvees:_________.lettresFausses:.
+22H:40M:56S : **CLIENT scannedChar : C
+22H:40M:57S : **CLIENT scannedChar : A
+22H:40M:58S : **CLIENT scannedChar : S
+22H:40M:59S : **CLIENT scannedChar : T
+22H:40M:59S : **CLIENT scannedChar : Q
+22H:41M:0S : **CLIENT scannedChar : U
+22H:41M:1S : **CLIENT scannedChar : E
+22H:41M:6S : **CLIENT scannedChar : Y
+22H:41M:7S : **CLIENT envoi findeJeu: $Y
+22H:41M:8S : **CLIENT scannedChar : Y
+22H:41M:8S : **CLIENT envoi findeJeu: $Y
+22H:41M:8S : **CLIENT recu findeJeu: donnees:______$others:gyi4,12;g5,10;.
+22H:41M:8S : **CLIENT recu findeJeu: donnees:______$others:gyi4,12;g5,10;.
+22H:41M:8S : **CLIENT joueurs recus: others:gyi4,12;g5,10;.
+22H:41M:8S : **CLIENT joueurs recus: others:gyi4,12;g5,10;.
+23H:12M:47S : **CLIENT scannedChar : 
+23H:12M:47S : **CLIENT suppJoueur: gyi4
+23H:12M:48S : **CLIENT scannedChar : 
+23H:13M:43S : **CLIENT pseudo envoyé: aezr
+23H:13M:46S : **CLIENT joueurs recus: others:aezr7,10;NoPseudoYet,10;.
+23H:13M:46S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+23H:13M:52S : **CLIENT pseudo envoyé: aze
+23H:13M:52S : **CLIENT joueurs recus: others:aezr7,10;aze4,10;.
+23H:13M:52S : **CLIENT bug_lettres: lettresTrouvees:______.lettresFausses:.
+23H:13M:56S : **CLIENT scannedChar : S
+23H:13M:57S : **CLIENT scannedChar : E
+23H:13M:58S : **CLIENT scannedChar : R
+23H:13M:59S : **CLIENT scannedChar : V
+23H:14M:0S : **CLIENT scannedChar : I
+23H:14M:12S : **CLIENT scannedChar : Y
+23H:14M:12S : **CLIENT envoi findeJeu: $Y
+23H:14M:14S : **CLIENT envoi findeJeu: $Y
+23H:14M:14S : **CLIENT recu findeJeu: donnees:_________$others:aezr7,10;aze4,26;NoPseudoYet,10;.
+23H:14M:14S : **CLIENT recu findeJeu: donnees:_________$others:aezr7,10;aze4,26;NoPseudoYet,10;.
+23H:14M:14S : **CLIENT joueurs recus: others:aezr7,10;aze4,26;NoPseudoYet,10;.
+23H:14M:14S : **CLIENT joueurs recus: others:aezr7,10;aze4,26;NoPseudoYet,10;.
+23H:14M:14S : **CLIENT scannedChar : Y
+23H:14M:15S : **CLIENT pseudo envoyé: aezr
