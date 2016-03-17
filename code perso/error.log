@@ -1161,3 +1161,183 @@
 11H:27M:53S : **CLIENT recu findeJeu: donnees:_______$others:ch4,24;gdfh5,10;NoPseudoYet,10;.
 11H:27M:53S : **CLIENT joueurs recus: others:ch4,24;gdfh5,10;NoPseudoYet,10;.
 11H:27M:53S : **CLIENT joueurs recus: others:ch4,24;gdfh5,10;NoPseudoYet,10;.
+14H:29M:26S : **CLIENT pseudo envoyÃ©: dennis
+14H:29M:41S : **CLIENT joueurs recus: others:dennis4,10;NoPseudoYet,10;.
+14H:29M:41S : **CLIENT bug_lettres: lettresTrouvees:________.lettresFausses:.
+14H:29M:50S : **CLIENT pseudo envoyÃ©: theo
+14H:29M:50S : **CLIENT joueurs recus: others:dennis4,10;theo5,10;.
+14H:29M:50S : **CLIENT bug_lettres: lettresTrouvees:________.lettresFausses:.
+14H:29M:53S : **CLIENT scannedChar : AX¢Eý
+14H:29M:56S : **CLIENT scannedChar : EÊã—ÿ
+14H:30M:0S : **CLIENT scannedChar : PX¢Eý
+14H:30M:2S : **CLIENT scannedChar : LÊã—ÿ
+14H:30M:3S : **CLIENT scannedChar : EÊã—ÿ
+14H:30M:3S : **CLIENT scannedChar : UÊã—ÿ
+14H:30M:4S : **CLIENT scannedChar : VÊã—ÿ
+14H:30M:5S : **CLIENT scannedChar : OÊã—ÿ
+14H:30M:5S : **CLIENT scannedChar : RX¢Eý
+14H:30M:6S : **CLIENT scannedChar : IÊã—ÿ
+14H:30M:9S : **CLIENT envoi findeJeu: $Y
+14H:30M:11S : **CLIENT scannedChar : YX¢Eý
+14H:30M:15S : **CLIENT envoi findeJeu: $Y
+14H:30M:15S : **CLIENT recu findeJeu: donnees:______$others:dennis4,11;theo5,26;.
+14H:30M:15S : **CLIENT joueurs recus: others:dennis4,11;theo5,26;.
+14H:30M:15S : **CLIENT recu findeJeu: donnees:______$others:dennis4,11;theo5,26;.
+14H:30M:15S : **CLIENT joueurs recus: others:dennis4,11;theo5,26;.
+14H:30M:16S : **CLIENT scannedChar : YX¢Eý
+14H:30M:22S : **CLIENT scannedChar : NÊã—ÿ
+14H:30M:39S : **CLIENT scannedChar : DX¢Eý
+14H:30M:47S : **CLIENT scannedChar : PX¢Eý
+14H:30M:48S : **CLIENT scannedChar : OX¢Eý
+14H:31M:4S : **CLIENT pseudo envoyÃ©: trois
+14H:31M:4S : **CLIENT joueurs recus: others:dennis4,11;theo5,25;trois6,10;.
+14H:31M:4S : **CLIENT bug_lettres: lettresTrouvees:PO____.lettresFausses:YND.
+14H:31M:11S : **CLIENT scannedChar : RV[Ñÿ
+14H:31M:25S : **CLIENT scannedChar : X¢Eý
+14H:31M:25S : **CLIENT suppJoueur: dennis4
+14H:31M:25S : **CLIENT suppJoueur: dennis4
+14H:31M:30S : **CLIENT scannedChar : DV[Ñÿ
+14H:31M:31S : **CLIENT scannedChar : RV[Ñÿ
+14H:31M:32S : **CLIENT scannedChar : EV[Ñÿ
+14H:31M:36S : **CLIENT scannedChar : FÊã—ÿ
+14H:31M:37S : **CLIENT scannedChar : GÊã—ÿ
+14H:31M:39S : **CLIENT scannedChar : SÊã—ÿ
+14H:31M:40S : **CLIENT scannedChar : TÊã—ÿ
+14H:31M:43S : **CLIENT envoi findeJeu: $Y
+14H:31M:45S : **CLIENT scannedChar : YV[Ñÿ
+14H:31M:48S : **CLIENT envoi findeJeu: $Y
+14H:31M:48S : **CLIENT recu findeJeu: donnees:_____$others:trois6,12;theo5,35;.
+14H:31M:48S : **CLIENT joueurs recus: others:trois6,12;theo5,35;.
+14H:31M:48S : **CLIENT recu findeJeu: donnees:_____$others:trois6,12;theo5,35;.
+14H:31M:48S : **CLIENT joueurs recus: others:trois6,12;theo5,35;.
+14H:31M:57S : **CLIENT pseudo envoyÃ©: dennis
+14H:31M:57S : **CLIENT joueurs recus: others:trois6,12;theo5,35;dennis7,10;.
+14H:31M:57S : **CLIENT bug_lettres: lettresTrouvees:_____.lettresFausses:.
+14H:32M:4S : **CLIENT scannedChar : ¯Û+ü
+14H:32M:4S : **CLIENT suppJoueur: dennis7
+14H:32M:4S : **CLIENT suppJoueur: dennis7
+14H:32M:9S : **CLIENT pseudo envoyÃ©: dennis
+14H:32M:9S : **CLIENT joueurs recus: others:trois6,12;theo5,35;dennis4,10;.
+14H:32M:9S : **CLIENT bug_lettres: lettresTrouvees:_____.lettresFausses:.
+14H:32M:17S : **CLIENT scannedChar : Êã—ÿ
+14H:32M:17S : **CLIENT suppJoueur: theo5
+14H:32M:17S : **CLIENT suppJoueur: theo5
+14H:32M:33S : **CLIENT scannedChar : E
+14H:32M:44S : **CLIENT pseudo envoyÃ©: theo
+14H:32M:44S : **CLIENT joueurs recus: others:trois6,12;dennis4,11;theo7,10;.
+14H:32M:44S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:.
+14H:33M:13S : **CLIENT scannedChar : _Q
+14H:33M:13S : **CLIENT suppJoueur: theo7
+14H:33M:13S : **CLIENT suppJoueur: theo7
+14H:34M:26S : **CLIENT scannedChar : V[Ñÿ
+14H:34M:26S : **CLIENT suppJoueur: trois6
+14H:34M:27S : **CLIENT scannedChar : 
+14H:34M:44S : **CLIENT pseudo envoyÃ©: dennis
+14H:34M:46S : **CLIENT joueurs recus: others:dennis5,10;NoPseudoYet,10;.
+14H:34M:46S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:.
+14H:34M:47S : **CLIENT pseudo envoyÃ©: theo
+14H:34M:47S : **CLIENT joueurs recus: others:dennis5,10;theo4,10;.
+14H:34M:47S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:.
+14H:34M:52S : **CLIENT pseudo envoyÃ©: george
+14H:34M:52S : **CLIENT joueurs recus: others:dennis5,10;theo4,10;george6,10;.
+14H:34M:52S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:.
+14H:34M:54S : **CLIENT scannedChar : Ü— þ
+14H:34M:54S : **CLIENT suppJoueur: dennis5
+14H:35M:0S : **CLIENT scannedChar : DD>þ
+14H:35M:4S : **CLIENT scannedChar : ED>þ
+14H:35M:12S : **CLIENT scannedChar : AD>þ
+14H:35M:24S : **CLIENT scannedChar : D>þ
+14H:35M:24S : **CLIENT suppJoueur: george6
+14H:35M:27S : **CLIENT pseudo envoyÃ©: dennis
+14H:35M:27S : **CLIENT joueurs recus: others:theo4,10;dennis7,10;.
+14H:35M:27S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:DA.
+14H:35M:37S : **CLIENT pseudo envoyÃ©: trois
+14H:35M:37S : **CLIENT joueurs recus: others:theo4,10;dennis7,10;trois5,10;.
+14H:35M:37S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:DA.
+14H:35M:41S : **CLIENT scannedChar : E*Êþ
+14H:35M:43S : **CLIENT scannedChar : E*Êþ
+14H:35M:44S : **CLIENT scannedChar : E*Êþ
+14H:35M:45S : **CLIENT scannedChar : Z*Êþ
+14H:35M:49S : **CLIENT suppJoueur: theo4
+14H:35M:49S : **CLIENT suppJoueur: theo4
+14H:36M:9S : **CLIENT scannedChar : E'3ý
+14H:36M:10S : **CLIENT scannedChar : S'3ý
+14H:36M:18S : **CLIENT pseudo envoyÃ©: qsdfgh
+14H:36M:18S : **CLIENT joueurs recus: others:trois5,10;dennis7,9;qsdfgh6,10;.
+14H:36M:18S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:DAZS.
+14H:36M:22S : **CLIENT scannedChar : òUý
+14H:36M:22S : **CLIENT suppJoueur: qsdfgh6
+14H:36M:22S : **CLIENT suppJoueur: qsdfgh6
+14H:36M:29S : **CLIENT pseudo envoyÃ©: qsdqsd
+14H:36M:29S : **CLIENT joueurs recus: others:trois5,10;dennis7,9;qsdqsd4,10;.
+14H:36M:29S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:DAZS.
+14H:36M:33S : **CLIENT scannedChar : 
+­ŽÌü
+14H:36M:33S : **CLIENT scannedChar : S­ŽÌü
+14H:36M:33S : **CLIENT scannedChar : D­ŽÌü
+14H:36M:33S : **CLIENT scannedChar : F­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : S­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : D­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : F­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : 
+­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : D­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : E­ŽÌü
+14H:36M:34S : **CLIENT scannedChar : ­ŽÌü
+14H:36M:34S : **CLIENT suppJoueur: qsdqsd4
+14H:36M:34S : **CLIENT suppJoueur: qsdqsd4
+14H:36M:40S : **CLIENT pseudo envoyÃ©: qsdqs
+14H:36M:40S : **CLIENT joueurs recus: others:trois5,10;dennis7,9;qsdqs6,10;.
+14H:36M:40S : **CLIENT bug_lettres: lettresTrouvees:____E.lettresFausses:DAZSF.
+14H:36M:44S : **CLIENT scannedChar : 
+¬°ý
+14H:36M:44S : **CLIENT scannedChar : S¬°ý
+14H:36M:44S : **CLIENT scannedChar : S¬°ý
+14H:36M:44S : **CLIENT scannedChar : S¬°ý
+14H:36M:44S : **CLIENT scannedChar : C¬°ý
+14H:36M:49S : **CLIENT scannedChar : ¬°ý
+14H:36M:49S : **CLIENT suppJoueur: qsdqs6
+14H:36M:49S : **CLIENT suppJoueur: qsdqs6
+14H:37M:23S : **CLIENT scannedChar : '3ý
+14H:37M:23S : **CLIENT suppJoueur: dennis7
+14H:37M:25S : **CLIENT scannedChar : †OŸþ
+14H:37M:34S : **CLIENT pseudo envoyÃ©: dennis
+14H:37M:35S : **CLIENT joueurs recus: others:dennis4,10;NoPseudoYet,10;.
+14H:37M:35S : **CLIENT bug_lettres: lettresTrouvees:__C_E.lettresFausses:DAZSF.
+14H:37M:36S : **CLIENT pseudo envoyÃ©: theo
+14H:37M:36S : **CLIENT joueurs recus: others:dennis4,10;theo5,10;.
+14H:37M:36S : **CLIENT bug_lettres: lettresTrouvees:__C_E.lettresFausses:DAZSF.
+14H:37M:39S : **CLIENT pseudo envoyÃ©: trois
+14H:37M:39S : **CLIENT joueurs recus: others:dennis4,10;theo5,10;trois6,10;.
+14H:37M:39S : **CLIENT bug_lettres: lettresTrouvees:__C_E.lettresFausses:DAZSF.
+14H:37M:43S : **CLIENT scannedChar : 
+Mþ
+14H:37M:43S : **CLIENT scannedChar : SMþ
+14H:37M:43S : **CLIENT scannedChar : DMþ
+14H:37M:43S : **CLIENT scannedChar : YMþ
+14H:37M:44S : **CLIENT scannedChar : YMþ
+14H:37M:44S : **CLIENT scannedChar : YMþ
+14H:37M:48S : **CLIENT scannedChar : Mþ
+14H:37M:48S : **CLIENT suppJoueur: trois6
+14H:37M:48S : **CLIENT suppJoueur: trois6
+14H:37M:51S : **CLIENT scannedChar : E¥fžÿ
+14H:37M:53S : **CLIENT scannedChar : F¥fžÿ
+14H:37M:55S : **CLIENT scannedChar : G¥fžÿ
+14H:37M:57S : **CLIENT scannedChar : K·º)þ
+14H:37M:59S : **CLIENT scannedChar : ·º)þ
+14H:37M:59S : **CLIENT suppJoueur: dennis4
+14H:38M:4S : **CLIENT pseudo envoyÃ©: jm
+14H:38M:4S : **CLIENT joueurs recus: others:theo5,9;jm7,10;.
+14H:38M:4S : **CLIENT bug_lettres: lettresTrouvees:__C_E.lettresFausses:DAZSFYGK.
+14H:38M:8S : **CLIENT scannedChar : NaoŽü
+14H:38M:9S : **CLIENT scannedChar : BaoŽü
+14H:38M:14S : **CLIENT scannedChar : Y¥fžÿ
+14H:38M:15S : **CLIENT envoi findeJeu: $Y
+14H:38M:15S : **CLIENT recu findeJeu: donnees:______$others:theo5,6;.
+14H:38M:15S : **CLIENT joueurs recus: others:theo5,6;.
+14H:38M:19S : **CLIENT scannedChar : E¥fžÿ
+14H:38M:20S : **CLIENT scannedChar : Z¥fžÿ
+14H:38M:23S : **CLIENT scannedChar : ÿ¥fžÿ
+14H:38M:23S : **CLIENT scannedChar : ÿ¥fžÿ
+14H:38M:23S : **CLIENT scannedChar : ÿ¥fžÿ
+14H:38M:23S : **CLIENT scannedChar : ÿ¥fžÿ
