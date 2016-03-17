@@ -49,7 +49,10 @@ int phase_rejouer = 0;
 int nbJoueur;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
-
+/*TODO: probleme lors de la connexion de 2 joueurs en simultanés
+		probleme quand un joueur se co pendant la phase de rejoue, il ne recois pas le nouveau jeu
+		probleme quand un joueur se connecte quand on envoie les donnes d'apres la phase de rejoue -> crash serveur "stack smashing detected"
+		*/
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
@@ -397,6 +400,7 @@ char jeu(thread_socket* tSock){
         bzero(envoi,50);
         bzero(buffer,50);
         sleep(1);
+		printf("lol\n");
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
            
             //si buffer[0] est different d'echap(27) et de $ et qu'on est pas dans la phase rejouer
@@ -413,7 +417,13 @@ char jeu(thread_socket* tSock){
 
 					if(jeuFini() == 't'){
 						phase_rejouer = 1;
-						nbJoueur = socket_tab_size;
+						nbJoueur = 0;
+						int i = 0;
+						for(i; i < socket_tab_size; i++){
+							if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0){
+								nbJoueur++;
+							}
+						}
 						res = finJeu(tSock,"_");
 						fin = 1;
 						
