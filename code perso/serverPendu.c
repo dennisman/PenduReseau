@@ -52,6 +52,7 @@ int nbJoueur;
 /*TODO: probleme lors de la connexion de 2 joueurs en simultanés
 		probleme quand un joueur se co pendant la phase de rejoue, il ne recois pas le nouveau jeu
 		probleme quand un joueur se connecte quand on envoie les donnes d'apres la phase de rejoue -> crash serveur "stack smashing detected"
+		probleme de frezze quand un joueur se reconnecte sur le mm terminal
 		*/
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
@@ -83,6 +84,8 @@ void deconnexion(thread_socket* thread_sock){
 
 //ETAPE 1 de l'initialisation: pseudo
 void init_pseudo(thread_socket* tSock, char* buffer){
+	char* p = "NoPseudoYet";
+	strcpy(tSock->pseudo, p);
 
   char buffer_pseudo[10];
   char pseudo[12]="";
@@ -282,10 +285,13 @@ char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 void renvoi(char* message){
 
         printf("envoi:%s\n",message);
+			printf("socket_tab_size:%d\n",socket_tab_size);
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
+			printf("pseudo:%s\n",socket_tab[i]->pseudo);
             if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0){
-			    if(write(socket_tab[i]->socket,message,strlen(message)+1)<0){
+			printf("i:%d\n",i);
+			    if(write(socket_tab[i]->socket,message,strlen(message))<0){
 				    printf("renoie\n");
 				    deconnexion(socket_tab[i]);
 			    }
@@ -348,12 +354,13 @@ char finJeu(thread_socket* tSock, char buff[]){
         }
         strcat(tmp,".");
         renvoi(tmp);
-		
+		printf("plop1\n");
 		for(i = 0; i < nbJoueur; i++){
 			reponses[i] = 'a';
 		}
 		reponses_tab_size = 0;
     
+		printf("plop2\n");
         
     }
     return res;
@@ -388,6 +395,8 @@ char jeuFini(){
 }
 
 char jeu(thread_socket* tSock){
+	
+		printf("lol0\n");
     char res = 'F';
     char buffer[50];
 
@@ -396,11 +405,13 @@ char jeu(thread_socket* tSock){
     strcpy(envoi,"");
     char * pseudo = tSock->pseudo ;
     int fin = 0;
+	
+		printf("lol1\n");
     while(fin == 0){
+		printf("lol2\n");
         bzero(envoi,50);
         bzero(buffer,50);
         sleep(1);
-		printf("lol\n");
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
            
             //si buffer[0] est different d'echap(27) et de $ et qu'on est pas dans la phase rejouer
@@ -504,7 +515,6 @@ main(int argc, char **argv) {
         initialisation(thread_sock);
         //------------2e etape------------------
         // echanges avec le client.
-        char tmp[256];
 
         while(jeu(thread_sock) == 'Y'){}
         
