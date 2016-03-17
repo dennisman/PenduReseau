@@ -572,6 +572,8 @@ int main(int argc, char **argv) {
         strcpy(nomJ,strtok(recu,"."));
         sprintf(infos,"%s s'est déconnecté",nomJ);
         wcolor_set(winInfos,CYAN_B,NULL);
+        wrefresh(winInfos);
+        wcolor_set(winInfos,WHITE_B,NULL);
         suppJoueur(nomJ);
         aff_scores();
         break;
