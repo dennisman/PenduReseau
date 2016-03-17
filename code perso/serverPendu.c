@@ -49,15 +49,10 @@ int phase_rejouer = 0;
 int nbJoueur;
 
 /*------------------FONCTION INTERRUCTION------------------------------------*/
-/*TODO: probleme lors de la connexion de 2 joueurs en simultanés
-		probleme quand un joueur se co pendant la phase de rejoue, il ne recois pas le nouveau jeu
-		probleme quand un joueur se connecte quand on envoie les donnes d'apres la phase de rejoue -> crash serveur "stack smashing detected"
-		probleme de frezze quand un joueur se reconnecte sur le mm terminal
-		*/
 /*------------------------------------------------------*/
 /*------------------------------------------------------*/
 
-
+//fonction qui gere la deconnexion d'un client
 void deconnexion(thread_socket* thread_sock){
     int i;
     for(i=0; i<socket_tab_size;i++){
@@ -90,7 +85,6 @@ void init_pseudo(thread_socket* tSock, char* buffer){
   char buffer_pseudo[10];
   char pseudo[12]="";
   if (read(tSock->socket, buffer_pseudo, sizeof(buffer_pseudo)) < 0){
-      printf("deco a l'init \n");
       deconnexion(tSock);
   }else{
     // creation du pseudo concaténé avec son numéro de socket
@@ -107,6 +101,7 @@ void init_pseudo(thread_socket* tSock, char* buffer){
   }
 }
 
+//initilisation des informations des autres joueurs
 void init_others(char* buffer2){
 	char buffer[256]="others:";
 	int user;
@@ -127,6 +122,8 @@ void init_others(char* buffer2){
 	strcat(buffer2,buffer);
 
 }
+
+//initialisation des informations concernant le mot mystere
 void init_mot(char* buffer){
   char buff[50] ="taille du mot:";
   char str[5];
@@ -140,7 +137,6 @@ void init_mot(char* buffer){
 void init_lettres(char* buffer){
 
    char buffer2[200]="lettresTrouvees:";
-
    strcat(buffer2,lettres.motHache);
    strcat(buffer2,".lettresFausses:");
    strcat(buffer2,lettres.lettre_trouve_fausse);
@@ -149,6 +145,7 @@ void init_lettres(char* buffer){
    
 }
 
+//initialisation des données du joueur et envoi des données qu'il à besoin
 void initialisation(thread_socket* tSock){
     tSock->points = 10;
     char buffer[500]="";
@@ -165,14 +162,12 @@ void initialisation(thread_socket* tSock){
     strcat(buffer,"$");
     init_lettres(buffer);
     strcat(buffer,"$");
-    printf(" buffer final : %s\n", buffer);
     write(tSock->socket,buffer,strlen(buffer)+1);
     char message[20];
     bzero(message,20);
     strcpy(message,"c:");
     strcat(message,tSock->pseudo);
     strcat(message,".");
-    printf("connexion :%s", message);
     int i = 0;
     for(i; i < socket_tab_size; i++){
         
@@ -191,6 +186,8 @@ void initialisation(thread_socket* tSock){
 
 }
 
+
+//initialise le mot à trouver et toutes les variables qui en dépendande
 void initialisationMot(){
 
 	piocherMot(lettres.mot);
@@ -210,6 +207,7 @@ void initialisationMot(){
 	phase_rejouer = 0;
 }
 
+//preparation des données pour l'envoie au clients
 char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 	unsigned int i;
 	int trouver = 0;
@@ -272,7 +270,6 @@ char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 		
 	}
 
-    printf("point: %d \n",tSock->points);
 
 	strcat(res,",\0");
 
@@ -285,14 +282,10 @@ char* pendu(char lettrePropose, char res[],thread_socket* tSock){
 void renvoi(char* message){
 
         printf("envoi:%s\n",message);
-			printf("socket_tab_size:%d\n",socket_tab_size);
 		int i = 0;
 		for(i; i < socket_tab_size; i++){
-			printf("pseudo:%s\n",socket_tab[i]->pseudo);
             if(strcmp(socket_tab[i]->pseudo,"NoPseudoYet")!=0){
-			printf("i:%d\n",i);
 			    if(write(socket_tab[i]->socket,message,strlen(message))<0){
-				    printf("renoie\n");
 				    deconnexion(socket_tab[i]);
 			    }
 			}
@@ -300,7 +293,7 @@ void renvoi(char* message){
 	}
 }
 
-
+//fonction qui retourne N si le joueur ne veux pas rejouer, Y sinon
 char finJeu(thread_socket* tSock, char buff[]){
 
 
@@ -309,18 +302,15 @@ char finJeu(thread_socket* tSock, char buff[]){
     if(buff[0] != '$'){
 
         if(read(tSock->socket, buffer, sizeof(buffer)) > 0){
-	        printf("buff1:%s \n",buffer);
             if (buffer[1] == 'Y'){
                 res ='Y';
             } 
         }else{
-				printf("finjeu\n");
         	deconnexion(tSock);
         	
         }
     } else {
 		res = buff[1];
-		printf("buff2:%s \n",buff);
 	}
 	
 	if(res != 'Y'){deconnexion(tSock);}
@@ -330,9 +320,7 @@ char finJeu(thread_socket* tSock, char buff[]){
     int i = 0;
     int flag = 1;
     for(i; i < nbJoueur; i++){
-        printf("reponses[%d]: %c \n",i,reponses[i]);
         if(reponses[i] !='Y' && reponses[i] !='N' ){flag = 0;}
-        printf("flag: %d \n",flag);
         
     }
 	//quand tout le monde a rendu la reponse
@@ -348,19 +336,16 @@ char finJeu(thread_socket* tSock, char buff[]){
             strcat(tmp,",");
 			char str[5];
 			sprintf(str,"%d",socket_tab[i]->points);
-			printf("point: %d \n",socket_tab[i]->points);
             strcat(tmp,str);
             strcat(tmp,";");
         }
         strcat(tmp,".");
         renvoi(tmp);
-		printf("plop1\n");
 		for(i = 0; i < nbJoueur; i++){
 			reponses[i] = 'a';
 		}
 		reponses_tab_size = 0;
     
-		printf("plop2\n");
         
     }
     return res;
@@ -394,9 +379,9 @@ char jeuFini(){
     return res;
 }
 
+//fonction qui gere toute la phase de jeu
 char jeu(thread_socket* tSock){
 	
-		printf("lol0\n");
     char res = 'F';
     char buffer[50];
 
@@ -406,9 +391,7 @@ char jeu(thread_socket* tSock){
     char * pseudo = tSock->pseudo ;
     int fin = 0;
 	
-		printf("lol1\n");
     while(fin == 0){
-		printf("lol2\n");
         bzero(envoi,50);
         bzero(buffer,50);
         sleep(1);
@@ -417,7 +400,6 @@ char jeu(thread_socket* tSock){
             //si buffer[0] est different d'echap(27) et de $ et qu'on est pas dans la phase rejouer
             if(buffer[0] != 27 && buffer[0] != '$' && phase_rejouer == 0){
 
-                    printf("buffer:%s \n",buffer);
                     char tmp[50];
                     pendu(buffer[0],tmp,tSock);
                     strcat(envoi,tmp);
@@ -441,7 +423,6 @@ char jeu(thread_socket* tSock){
 					}
 					
                 } else if(buffer[0] == 27){
-                    printf("echap\n");
                     fin = 1;
                     deconnexion(tSock);
                     res = 'F';
@@ -455,7 +436,6 @@ char jeu(thread_socket* tSock){
 		
 		}else{
 
-				printf("deco sauvage\n");
 			fin = 1;
 			deconnexion(tSock);
 			res = 'F';
